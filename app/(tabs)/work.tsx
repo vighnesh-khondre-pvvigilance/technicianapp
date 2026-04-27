@@ -17,9 +17,9 @@ import {
 } from "@expo/vector-icons";
 import { router } from "expo-router";
 
-import Screen from "./../src/components/Screen";
-import { Theme } from "./../src/theme/theme";
-import { workData } from "./../src/data/work";
+import Screen from "../../src/components/Screen";
+import { Theme } from "../../src/theme/theme";
+import { workData } from "../../src/data/work";
 
 export default function Work() {
   const currentTech =

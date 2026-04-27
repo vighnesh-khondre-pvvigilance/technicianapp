@@ -1,8 +1,8 @@
 import { Tabs ,Redirect} from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { Theme } from "./../src/theme/theme";
+import { Theme } from "../../src/theme/theme";
 
-import { useAuth } from "./../src/context/AuthContext";
+import { useAuth } from "../../src/context/AuthContext";
 import { ActivityIndicator, View } from "react-native";
 
 export default function TabsLayout() {

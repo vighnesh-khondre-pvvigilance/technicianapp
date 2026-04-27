@@ -12,11 +12,11 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import Screen from "./../src/components/Screen";
-import { Theme } from "../src/theme/theme";
+import Screen from "../../src/components/Screen";
+import { Theme } from "../../src/theme/theme";
 
-import { Contact, Role } from "../src/types/contact";
-import { getContacts } from "../src/services/contactService";
+import { Contact, Role } from "../../src/types/contact";
+import { getContacts } from "../../src/services/contactService";
 
 const ROLES: (Role | "All")[] = [
   "All",

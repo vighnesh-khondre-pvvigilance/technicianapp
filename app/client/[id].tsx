@@ -16,9 +16,9 @@ import {
 
 import { Ionicons } from "@expo/vector-icons";
 
-import Screen from "../src/components/Screen";
-import { Theme } from "../src/theme/theme";
-import { workData } from "../src/data/work";
+import Screen from "../../src/components/Screen";
+import { Theme } from "../../src/theme/theme";
+import { workData } from "../../src/data/work";
 
 export default function ClientPlants() {
   const { id } = useLocalSearchParams();

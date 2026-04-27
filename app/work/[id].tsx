@@ -11,19 +11,19 @@ import {
 } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 
-import Screen from "./../src/components/Screen";
-import { Theme } from "./../src/theme/theme";
+import Screen from "../../src/components/Screen";
+import { Theme } from "../../src/theme/theme";
 
-import { workData } from "./../src/data/work";
+import { workData } from "../../src/data/work";
 
-import { useVisitWorkflow } from "./../src/hooks/useVisitWorkflow";
-import { validateVisitForm } from "./../src/utils/validators";
+import { useVisitWorkflow } from "../../src/hooks/useVisitWorkflow";
+import { validateVisitForm } from "../../src/utils/validators";
 
-import StepApproval from "./../src/components/workflow/StepApproval";
-import StepSafety from "./../src/components/workflow/StepSafety";
-import StepVisitForm from "./../src/components/workflow/StepVisitForm";
-import StepUpload from "./../src/components/workflow/StepUpload";
-import StepCleaning from "./../src/components/workflow/StepCleaning";
+import StepApproval from "../../src/components/workflow/StepApproval";
+import StepSafety from "../../src/components/workflow/StepSafety";
+import StepVisitForm from "../../src/components/workflow/StepVisitForm";
+import StepUpload from "../../src/components/workflow/StepUpload";
+import StepCleaning from "../../src/components/workflow/StepCleaning";
 
 export default function WorkDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();

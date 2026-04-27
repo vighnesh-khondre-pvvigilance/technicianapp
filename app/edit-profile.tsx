@@ -10,9 +10,9 @@ import {
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 
-import Screen from "./src/components/Screen";
-import { Theme } from "./src/theme/theme";
-import { useAuth } from "./src/context/AuthContext";
+import Screen from "../src/components/Screen";
+import { Theme } from "../src/theme/theme";
+import { useAuth } from "../src/context/AuthContext";
 import { router } from "expo-router";
 
 export default function EditProfile() {

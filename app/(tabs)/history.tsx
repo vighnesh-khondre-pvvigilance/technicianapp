@@ -19,14 +19,14 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 
-import Screen from "./../src/components/Screen";
-import { Theme } from "./../src/theme/theme";
+import Screen from "../../src/components/Screen";
+import { Theme } from "../../src/theme/theme";
 
-import { Work } from "../src/types/work";
+import { Work } from "../../src/types/work";
 
 import {
   getCompletedWork,
-} from "../src/services/workService";
+} from "../../src/services/workService";
 
 type FilterType =
   | "all"

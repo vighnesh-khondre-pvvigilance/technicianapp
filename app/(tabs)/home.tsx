@@ -9,20 +9,20 @@ import {
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import BottomSheet from "@gorhom/bottom-sheet";
 
-import Screen from "../src/components/Screen";
-import HeaderCard from "../src/components/home/HeaderCard";
-import StatsRow from "../src/components/home/StatsRow";
-import QuickSolveGrid from "../src/components/home/QuickSolveGrid";
-import RecentWorkList from "../src/components/home/RecentWorkList";
-import WeatherCard from "../src/components/home/WeatherCard";
+import Screen from "../../src/components/Screen";
+import HeaderCard from "../../src/components/home/HeaderCard";
+import StatsRow from "../../src/components/home/StatsRow";
+import QuickSolveGrid from "../../src/components/home/QuickSolveGrid";
+import RecentWorkList from "../../src/components/home/RecentWorkList";
+import WeatherCard from "../../src/components/home/WeatherCard";
 
-import InverterCalc from "../src/components/toolbox/InverterCalc";
-import CleaningCalc from "../src/components/toolbox/CleaningCalc";
-import VocCalc from "../src/components/toolbox/VocCalc";
-import VoltageDrop from "../src/components/toolbox/VoltageDrop";
-import YieldCalc from "../src/components/toolbox/YieldCalc";
+import InverterCalc from "../../src/components/toolbox/InverterCalc";
+import CleaningCalc from "../../src/components/toolbox/CleaningCalc";
+import VocCalc from "../../src/components/toolbox/VocCalc";
+import VoltageDrop from "../../src/components/toolbox/VoltageDrop";
+import YieldCalc from "../../src/components/toolbox/YieldCalc";
 
-import { Theme } from "../src/theme/theme";
+import { Theme } from "../../src/theme/theme";
 
 export default function HomeScreen() {
   const [tool, setTool] = useState<string | null>(null);

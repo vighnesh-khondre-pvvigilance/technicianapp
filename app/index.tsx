@@ -1,3 +1,5 @@
+// app/index.tsx
+
 import {
   View,
   Text,
@@ -8,179 +10,171 @@ import {
   Platform,
   ScrollView,
   StatusBar,
+  Alert,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
-import Screen from "./src/components/Screen";
-import { Theme } from "./src/theme/theme";
-import { useAuth } from "./src/context/AuthContext";
-import { mockUser } from "./src/data/user";
+import Screen from "../src/components/Screen";
+import { Theme } from "../src/theme/theme";
 
-export default function Login() {
+export default function QuickJoinScreen() {
   const router = useRouter();
-  const { login } = useAuth();
 
-  const [id, setId] = useState("");
-  const [password, setPassword] = useState("");
-  const [secure, setSecure] = useState(true);
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [mobile, setMobile] = useState("");
 
-  const handleLogin = async () => {
-    await login(mockUser, "dummy-token");
-    router.replace("/(tabs)/home");
+  const handleContinue = () => {
+    if (!fullName || !email || !mobile) {
+      Alert.alert("Required", "Please fill all fields.");
+      return;
+    }
+
+    router.replace("/(public)/home");
   };
 
   return (
     <Screen>
       <StatusBar barStyle="dark-content" />
 
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={
-          Platform.OS === "ios"
-            ? "padding"
-            : undefined
-        }
-      >
-        <ScrollView
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scroll}
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <KeyboardAvoidingView
+          style={styles.flex}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={20}
         >
-          <View style={styles.container}>
-            {/* Top Brand */}
-            <View style={styles.brandWrap}>
-              <View style={styles.logoBox}>
-                <Ionicons
-                  name="flash"
-                  size={24}
-                  color="#fff"
-                />
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.scroll}
+          >
+            <View style={styles.container}>
+              {/* Brand */}
+              <View style={styles.brandWrap}>
+                <View style={styles.logoBox}>
+                  <Ionicons name="flash" size={24} color="#fff" />
+                </View>
+
+                <Text style={styles.brand}>PVprotech</Text>
+
+                <Text style={styles.caption}>
+                  Technician Onboarding
+                </Text>
               </View>
 
-              <Text style={styles.brand}>
-                PVprotech
-              </Text>
+              {/* Card */}
+              <View style={styles.card}>
+                <Text style={styles.heading}>Quick Join</Text>
 
-              <Text style={styles.caption}>
-                Technician Portal
-              </Text>
-            </View>
+                <Text style={styles.subheading}>
+                  Enter basic details to start your technician application.
+                </Text>
 
-            {/* Card */}
-            <View style={styles.card}>
-              <Text style={styles.heading}>
-                Sign In
-              </Text>
+                {/* Full Name */}
+                <Text style={styles.label}>Full Name</Text>
 
-              <Text style={styles.subheading}>
-                Access your assigned work,
-                reports and daily tasks.
-              </Text>
-
-              {/* ID */}
-              <Text style={styles.label}>
-                Technician ID
-              </Text>
-
-              <View style={styles.inputWrap}>
-                <Ionicons
-                  name="person-outline"
-                  size={18}
-                  color="#94A3B8"
-                />
-
-                <TextInput
-                  placeholder="Enter technician ID"
-                  placeholderTextColor="#94A3B8"
-                  value={id}
-                  onChangeText={setId}
-                  style={styles.input}
-                  autoCapitalize="none"
-                />
-              </View>
-
-              {/* Password */}
-              <Text style={styles.label}>
-                Password
-              </Text>
-
-              <View style={styles.inputWrap}>
-                <Ionicons
-                  name="lock-closed-outline"
-                  size={18}
-                  color="#94A3B8"
-                />
-
-                <TextInput
-                  placeholder="Enter password"
-                  placeholderTextColor="#94A3B8"
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry={secure}
-                  style={styles.input}
-                />
-
-                <TouchableOpacity
-                  onPress={() =>
-                    setSecure(!secure)
-                  }
-                >
+                <View style={styles.inputWrap}>
                   <Ionicons
-                    name={
-                      secure
-                        ? "eye-off-outline"
-                        : "eye-outline"
-                    }
+                    name="person-outline"
                     size={18}
                     color="#94A3B8"
+                  />
+
+                  <TextInput
+                    placeholder="Enter full name"
+                    placeholderTextColor="#94A3B8"
+                    value={fullName}
+                    onChangeText={setFullName}
+                    style={styles.input}
+                    returnKeyType="next"
+                  />
+                </View>
+
+                {/* Email */}
+                <Text style={styles.label}>Email</Text>
+
+                <View style={styles.inputWrap}>
+                  <Ionicons
+                    name="mail-outline"
+                    size={18}
+                    color="#94A3B8"
+                  />
+
+                  <TextInput
+                    placeholder="Enter email"
+                    placeholderTextColor="#94A3B8"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    value={email}
+                    onChangeText={setEmail}
+                    style={styles.input}
+                    returnKeyType="next"
+                  />
+                </View>
+
+                {/* Mobile */}
+                <Text style={styles.label}>Mobile Number</Text>
+
+                <View style={styles.inputWrap}>
+                  <Ionicons
+                    name="call-outline"
+                    size={18}
+                    color="#94A3B8"
+                  />
+
+                  <TextInput
+                    placeholder="Enter mobile number"
+                    placeholderTextColor="#94A3B8"
+                    keyboardType="phone-pad"
+                    maxLength={10}
+                    value={mobile}
+                    onChangeText={setMobile}
+                    style={styles.input}
+                    returnKeyType="done"
+                  />
+                </View>
+
+                {/* Continue */}
+                <TouchableOpacity
+                  style={styles.button}
+                  activeOpacity={0.9}
+                  onPress={handleContinue}
+                >
+                  <Text style={styles.buttonText}>Continue</Text>
+
+                  <Ionicons
+                    name="arrow-forward"
+                    size={18}
+                    color="#fff"
                   />
                 </TouchableOpacity>
               </View>
 
-              {/* Forgot */}
-              <TouchableOpacity
-                style={styles.forgotWrap}
-              >
-                <Text style={styles.forgot}>
-                  Forgot password?
-                </Text>
-              </TouchableOpacity>
-
-              {/* Login */}
-              <TouchableOpacity
-                style={styles.button}
-                activeOpacity={0.9}
-                onPress={handleLogin}
-              >
-                <Text style={styles.buttonText}>
-                  Login
-                </Text>
-
-                <Ionicons
-                  name="arrow-forward"
-                  size={18}
-                  color="#fff"
-                />
-              </TouchableOpacity>
+              {/* Footer */}
+              <Text style={styles.bottomText}>
+                Fast onboarding • 30 seconds
+              </Text>
             </View>
-
-            {/* Bottom */}
-            <Text style={styles.bottomText}>
-              Secure internal access only
-            </Text>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
+  flex: {
+    flex: 1,
+  },
+
   scroll: {
     flexGrow: 1,
     justifyContent: "center",
+    paddingVertical: 30,
   },
 
   container: {
@@ -269,18 +263,6 @@ const styles = StyleSheet.create({
     color: "#0F172A",
   },
 
-  forgotWrap: {
-    alignSelf: "flex-end",
-    marginBottom: 18,
-    marginTop: -4,
-  },
-
-  forgot: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: Theme.colors.primary,
-  },
-
   button: {
     height: 56,
     borderRadius: 16,
@@ -289,6 +271,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     gap: 8,
+    marginTop: 6,
   },
 
   buttonText: {

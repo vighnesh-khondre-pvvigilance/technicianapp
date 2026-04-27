@@ -8,10 +8,10 @@ import {
   Image,
   Alert,
 } from "react-native";
-import Screen from "../src/components/Screen";
-import { Theme } from "../src/theme/theme";
+import Screen from "../../src/components/Screen";
+import { Theme } from "../../src/theme/theme";
 import { Ionicons } from "@expo/vector-icons";
-import { useAuth } from "../src/context/AuthContext";
+import { useAuth } from "../../src/context/AuthContext";
 import { router } from "expo-router";
 import Animated, {
   FadeInDown,
@@ -184,16 +184,15 @@ export default function ProfileScreen() {
       );
     };
 
-  const handleLogout =
-    async () => {
-      await logout();
+  const handleLogout = async () => {
+  await AsyncStorage.removeItem("documentsCompleted");
 
-      await AsyncStorage.removeItem(
-        "documentsCompleted"
-      );
+  router.replace("/(public)/home");
 
-      router.replace("/");
-    };
+  setTimeout(async () => {
+    await logout();
+  }, 100);
+};
 
   return (
     <Screen>
