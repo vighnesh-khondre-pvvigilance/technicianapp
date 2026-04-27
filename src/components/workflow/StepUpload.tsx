@@ -12,7 +12,9 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons } from "@expo/vector-icons";
 import { Theme } from "../../theme/theme";
+import Screen from "../Screen";
 
 export default function StepUpload({
   form,
@@ -22,8 +24,47 @@ export default function StepUpload({
 }: any) {
   const uploads = form?.uploads || {};
 
-  /* Gallery */
-  const pickImage = async (field: string) => {
+  const FIELDS = [
+    {
+      title: "Client Signature",
+      field: "clientSignature",
+      icon: "create-outline",
+    },
+    {
+      title: "Extra Photo",
+      field: "extraPhoto",
+      icon: "image-outline",
+    },
+    {
+      title: "Inverter Photo",
+      field: "inverterPhoto",
+      icon: "flash-outline",
+    },
+    {
+      title: "Import Meter",
+      field: "importPhoto",
+      icon: "speedometer-outline",
+    },
+    {
+      title: "Export Meter",
+      field: "exportPhoto",
+      icon: "speedometer-outline",
+    },
+    {
+      title: "Net Meter",
+      field: "netPhoto",
+      icon: "analytics-outline",
+    },
+    {
+      title: "Generation Meter",
+      field: "generationPhoto",
+      icon: "bar-chart-outline",
+    },
+  ];
+
+  const pickImage = async (
+    field: string
+  ) => {
     const permission =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -44,18 +85,16 @@ export default function StepUpload({
       });
 
     if (!result.canceled) {
-      updateForm({
-        uploads: {
-          ...uploads,
-          [field]:
-            result.assets[0].uri,
-        },
-      });
+      saveImage(
+        field,
+        result.assets[0].uri
+      );
     }
   };
 
-  /* Camera */
-  const openCamera = async (field: string) => {
+  const openCamera = async (
+    field: string
+  ) => {
     const permission =
       await ImagePicker.requestCameraPermissionsAsync();
 
@@ -74,17 +113,37 @@ export default function StepUpload({
       });
 
     if (!result.canceled) {
-      updateForm({
-        uploads: {
-          ...uploads,
-          [field]:
-            result.assets[0].uri,
-        },
-      });
+      saveImage(
+        field,
+        result.assets[0].uri
+      );
     }
   };
 
-  const uploadFile = (
+  const saveImage = (
+    field: string,
+    uri: string
+  ) => {
+    updateForm({
+      uploads: {
+        ...uploads,
+        [field]: uri,
+      },
+    });
+  };
+
+  const removeImage = (
+    field: string
+  ) => {
+    updateForm({
+      uploads: {
+        ...uploads,
+        [field]: null,
+      },
+    });
+  };
+
+  const chooseImage = (
     field: string
   ) => {
     Alert.alert(
@@ -109,20 +168,16 @@ export default function StepUpload({
     );
   };
 
-  const removeImage = (
-    field: string
-  ) => {
-    updateForm({
-      uploads: {
-        ...uploads,
-        [field]: null,
-      },
-    });
-  };
+  const completed =
+    FIELDS.filter(
+      (item) =>
+        uploads[item.field]
+    ).length;
 
   const UploadCard = ({
     title,
     field,
+    icon,
   }: any) => {
     const image =
       uploads[field];
@@ -130,8 +185,22 @@ export default function StepUpload({
     return (
       <View style={styles.card}>
         <View
-          style={styles.top}
+          style={styles.topRow}
         >
+          <View
+            style={
+              styles.iconBox
+            }
+          >
+            <Ionicons
+              name={icon}
+              size={18}
+              color={
+                Theme.colors.primary
+              }
+            />
+          </View>
+
           <View
             style={{
               flex: 1,
@@ -152,7 +221,7 @@ export default function StepUpload({
             >
               {image
                 ? "Uploaded successfully"
-                : "Tap below to upload"}
+                : "Required upload"}
             </Text>
           </View>
 
@@ -163,67 +232,56 @@ export default function StepUpload({
                 styles.statusDone,
             ]}
           >
-            <Text
-              style={[
-                styles.statusText,
-                image && {
-                  color:
-                    "#fff",
-                },
-              ]}
-            >
-              {image
-                ? "✓"
-                : "+"}
-            </Text>
+            <Ionicons
+              name={
+                image
+                  ? "checkmark"
+                  : "add"
+              }
+              size={18}
+              color={
+                image
+                  ? "#fff"
+                  : Theme.colors.text
+              }
+            />
           </View>
         </View>
 
         {!image ? (
           <TouchableOpacity
-            activeOpacity={
-              0.9
+            style={
+              styles.uploadBox
             }
             onPress={() =>
-              uploadFile(
+              chooseImage(
                 field
               )
             }
           >
-            <LinearGradient
-              colors={[
-                "#ffffff",
-                "#f8fafc",
-              ]}
+            <Ionicons
+              name="cloud-upload-outline"
+              size={28}
+              color={
+                Theme.colors.primary
+              }
+            />
+
+            <Text
               style={
-                styles.uploadBox
+                styles.uploadText
               }
             >
-              <Text
-                style={
-                  styles.uploadIcon
-                }
-              >
-                ⬆
-              </Text>
+              Upload Image
+            </Text>
 
-              <Text
-                style={
-                  styles.uploadText
-                }
-              >
-                Upload Image
-              </Text>
-
-              <Text
-                style={
-                  styles.uploadSub
-                }
-              >
-                Camera or
-                Gallery
-              </Text>
-            </LinearGradient>
+            <Text
+              style={
+                styles.uploadSub
+              }
+            >
+              Camera or Gallery
+            </Text>
           </TouchableOpacity>
         ) : (
           <>
@@ -246,7 +304,7 @@ export default function StepUpload({
                   styles.lightBtn
                 }
                 onPress={() =>
-                  uploadFile(
+                  chooseImage(
                     field
                   )
                 }
@@ -286,75 +344,84 @@ export default function StepUpload({
   };
 
   return (
-    <ScrollView
-      showsVerticalScrollIndicator={
-        false
-      }
-      contentContainerStyle={{
-       
-        paddingBottom: 28,
-      }}
-    >
-      <View
-        style={styles.main}
+    <Screen>
+      <ScrollView
+        showsVerticalScrollIndicator={
+          false
+        }
+        contentContainerStyle={{
+          paddingBottom: 28,
+        }}
       >
-        <Text
-          style={styles.title}
+        {/* HERO */}
+        <LinearGradient
+          colors={[
+            Theme.colors.secondary,
+            "#111827",
+          ]}
+          style={styles.hero}
         >
-          Upload Documents
-        </Text>
-
-        <Text
-          style={styles.desc}
-        >
-          Clean & premium
-          upload experience
-          for all required
-          site images
-        </Text>
-
-        <UploadCard
-          title="Client Signature"
-          field="clientSignature"
-        />
-
-        <UploadCard
-          title="Extra Photo"
-          field="extraPhoto"
-        />
-
-        <UploadCard
-          title="Inverter Photo"
-          field="inverterPhoto"
-        />
-
-        <UploadCard
-          title="Import Meter"
-          field="importPhoto"
-        />
-
-        <UploadCard
-          title="Export Meter"
-          field="exportPhoto"
-        />
-
-        <UploadCard
-          title="Net Meter"
-          field="netPhoto"
-        />
-
-        <UploadCard
-          title="Generation Meter"
-          field="generationPhoto"
-        />
-
-        <View
-          style={styles.row}
-        >
-          <TouchableOpacity
+          <View
             style={
-              styles.backBtn
+              styles.heroIcon
             }
+          >
+            <Ionicons
+              name="cloud-upload"
+              size={24}
+              color="#fff"
+            />
+          </View>
+
+          <Text
+            style={
+              styles.heroTitle
+            }
+          >
+            Upload Documents
+          </Text>
+
+          <Text
+            style={
+              styles.heroSub
+            }
+          >
+            Submit all required
+            photos and proofs for
+            job completion.
+          </Text>
+
+          <View
+            style={
+              styles.progressRow
+            }
+          >
+            <Text
+              style={
+                styles.progressText
+              }
+            >
+              {completed}/
+              {FIELDS.length}
+              Completed
+            </Text>
+          </View>
+        </LinearGradient>
+
+        {/* LIST */}
+        {FIELDS.map((item) => (
+          <UploadCard
+            key={item.field}
+            title={item.title}
+            field={item.field}
+            icon={item.icon}
+          />
+        ))}
+
+        {/* ACTIONS */}
+        <View style={styles.row}>
+          <TouchableOpacity
+            style={styles.backBtn}
             onPress={onBack}
           >
             <Text
@@ -367,9 +434,9 @@ export default function StepUpload({
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={
-              styles.nextWrap
-            }
+            style={{
+              flex: 1,
+            }}
             onPress={onNext}
           >
             <LinearGradient
@@ -391,67 +458,88 @@ export default function StepUpload({
             </LinearGradient>
           </TouchableOpacity>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </Screen>
   );
 }
 
 const styles =
   StyleSheet.create({
-    main: {
+    hero: {
+      padding: 20,
+      borderRadius: 24,
+      marginBottom: 16,
+    },
+
+    heroIcon: {
+      width: 52,
+      height: 52,
+      borderRadius: 16,
       backgroundColor:
-        "#ffffff",
-      borderRadius: 26,
-      padding: 5,
+        "rgba(255,255,255,0.15)",
+      justifyContent:
+        "center",
+      alignItems:
+        "center",
+      marginBottom: 14,
     },
 
-    title: {
-      fontSize: 26,
+    heroTitle: {
+      color: "#fff",
+      fontSize: 24,
       fontWeight: "800",
-      color:
-        Theme.colors.text,
-      letterSpacing: 0.3,
     },
 
-    desc: {
+    heroSub: {
+      color: "#CBD5E1",
       marginTop: 6,
-      marginBottom: 18,
-      color:
-        Theme.colors.subtext,
-      lineHeight: 20,
+      lineHeight: 22,
+    },
+
+    progressRow: {
+      marginTop: 14,
+    },
+
+    progressText: {
+      color: "#fff",
+      fontWeight: "700",
+      fontSize: 13,
     },
 
     card: {
       backgroundColor:
-        "#ffffff",
+        "#fff",
       borderRadius: 22,
       padding: 14,
       marginBottom: 14,
       borderWidth: 1,
       borderColor:
         "#EEF2F7",
-      shadowColor:
-        "#000",
-      shadowOpacity: 0.05,
-      shadowRadius: 10,
-      shadowOffset: {
-        width: 0,
-        height: 4,
-      },
-      elevation: 3,
     },
 
-    top: {
+    topRow: {
       flexDirection: "row",
       alignItems:
         "center",
-      marginBottom: 12,
       gap: 12,
+      marginBottom: 14,
+    },
+
+    iconBox: {
+      width: 42,
+      height: 42,
+      borderRadius: 14,
+      backgroundColor:
+        "#FFF7ED",
+      justifyContent:
+        "center",
+      alignItems:
+        "center",
     },
 
     cardTitle: {
       fontSize: 15,
-      fontWeight: "700",
+      fontWeight: "800",
       color:
         Theme.colors.text,
     },
@@ -480,34 +568,25 @@ const styles =
         "#16A34A",
     },
 
-    statusText: {
-      fontSize: 18,
-      fontWeight: "800",
-      color:
-        Theme.colors.text,
-    },
-
     uploadBox: {
       height: 150,
       borderRadius: 18,
       borderWidth: 1.5,
       borderColor:
-        "#E2E8F0",
+        "#E5E7EB",
       borderStyle:
         "dashed",
       justifyContent:
         "center",
       alignItems:
         "center",
-    },
-
-    uploadIcon: {
-      fontSize: 30,
+      backgroundColor:
+        "#FAFAFA",
     },
 
     uploadText: {
-      marginTop: 8,
-      fontWeight: "700",
+      marginTop: 10,
+      fontWeight: "800",
       color:
         Theme.colors.text,
     },
@@ -521,7 +600,7 @@ const styles =
 
     preview: {
       width: "100%",
-      height: 190,
+      height: 210,
       borderRadius: 18,
     },
 
@@ -533,7 +612,7 @@ const styles =
 
     lightBtn: {
       flex: 1,
-      padding: 13,
+      padding: 14,
       borderRadius: 14,
       borderWidth: 1,
       borderColor:
@@ -550,7 +629,7 @@ const styles =
 
     deleteBtn: {
       flex: 1,
-      padding: 13,
+      padding: 14,
       borderRadius: 14,
       backgroundColor:
         "#FEF2F2",
@@ -571,7 +650,7 @@ const styles =
 
     backBtn: {
       flex: 1,
-      padding: 15,
+      padding: 16,
       borderRadius: 16,
       borderWidth: 1,
       borderColor:
@@ -580,6 +659,8 @@ const styles =
         "center",
       justifyContent:
         "center",
+      backgroundColor:
+        "#fff",
     },
 
     backText: {
@@ -588,12 +669,8 @@ const styles =
         Theme.colors.text,
     },
 
-    nextWrap: {
-      flex: 1,
-    },
-
     nextBtn: {
-      padding: 15,
+      padding: 16,
       borderRadius: 16,
       alignItems:
         "center",

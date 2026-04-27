@@ -1,5 +1,6 @@
 // src/components/workflow/StepApproval.tsx
 
+import React from "react";
 import {
   View,
   Text,
@@ -8,6 +9,7 @@ import {
   Image,
   ScrollView,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { Theme } from "../../theme/theme";
 import Screen from "../Screen";
 
@@ -15,91 +17,186 @@ export default function StepApproval({
   visit,
   onNext,
 }: any) {
+  const status =
+    visit?.status || "Pending";
+
+  const statusColor =
+    status === "Assigned"
+      ? "#2563EB"
+      : status === "Approved"
+      ? "#16A34A"
+      : "#F59E0B";
+
   return (
     <Screen>
-    <ScrollView
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={styles.wrap}
-    >
-      <View style={styles.card}>
-        <Text style={styles.title}>
-          Job Approval
-        </Text>
-
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>
-            {visit?.status || "Pending"}
-          </Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.label}>
-            Work Title
-          </Text>
-          <Text style={styles.value}>
-            {visit?.title || "-"}
-          </Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.label}>
-            Plant Name
-          </Text>
-          <Text style={styles.value}>
-            {visit?.plantName || "-"}
-          </Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.label}>
-            Owner Name
-          </Text>
-          <Text style={styles.value}>
-            {visit?.ownerName || "-"}
-          </Text>
-        </View>
-
-        <View style={styles.row}>
-          <View style={styles.half}>
-            <Text style={styles.label}>
-              Capacity
-            </Text>
-            <Text style={styles.value}>
-              {visit?.capacity || "-"}
-            </Text>
+      <ScrollView
+        showsVerticalScrollIndicator={
+          false
+        }
+        contentContainerStyle={{
+          paddingBottom: 28,
+        }}
+      >
+        {/* HERO */}
+        <View style={styles.hero}>
+          <View
+            style={styles.heroIcon}
+          >
+            <Ionicons
+              name="clipboard"
+              size={24}
+              color="#fff"
+            />
           </View>
 
-          <View style={styles.half}>
-            <Text style={styles.label}>
-              Assigned Date
+          <Text
+            style={styles.heroTitle}
+          >
+            Job Approval
+          </Text>
+
+          <Text
+            style={styles.heroSub}
+          >
+            Review assigned work
+            details before starting
+            the task.
+          </Text>
+        </View>
+
+        {/* STATUS */}
+        <View style={styles.card}>
+          <View
+            style={
+              styles.statusRow
+            }
+          >
+            <Text
+              style={
+                styles.sectionTitle
+              }
+            >
+              Work Status
             </Text>
-            <Text style={styles.value}>
-              {visit?.assignedDate || "-"}
-            </Text>
+
+            <View
+              style={[
+                styles.badge,
+                {
+                  backgroundColor:
+                    `${statusColor}15`,
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.badgeText,
+                  {
+                    color:
+                      statusColor,
+                  },
+                ]}
+              >
+                {status}
+              </Text>
+            </View>
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.label}>
-            Location
+        {/* JOB DETAILS */}
+        <View style={styles.card}>
+          <Text
+            style={
+              styles.sectionTitle
+            }
+          >
+            Job Details
           </Text>
-          <Text style={styles.value}>
-            {visit?.location || "-"}
+
+          <InfoRow
+            icon="briefcase-outline"
+            label="Work Title"
+            value={
+              visit?.title || "-"
+            }
+          />
+
+          <InfoRow
+            icon="business-outline"
+            label="Plant Name"
+            value={
+              visit?.plantName ||
+              "-"
+            }
+          />
+
+          <InfoRow
+            icon="person-outline"
+            label="Owner Name"
+            value={
+              visit?.ownerName ||
+              "-"
+            }
+          />
+
+          <InfoRow
+            icon="flash-outline"
+            label="Capacity"
+            value={
+              visit?.capacity ||
+              "-"
+            }
+          />
+
+          <InfoRow
+            icon="calendar-outline"
+            label="Assigned Date"
+            value={
+              visit?.assignedDate ||
+              "-"
+            }
+          />
+
+          <InfoRow
+            icon="location-outline"
+            label="Location"
+            value={
+              visit?.location ||
+              "-"
+            }
+          />
+        </View>
+
+        {/* NOTES */}
+        <View style={styles.card}>
+          <Text
+            style={
+              styles.sectionTitle
+            }
+          >
+            Task Notes
+          </Text>
+
+          <Text
+            style={
+              styles.notesText
+            }
+          >
+            {visit?.issue ||
+              "No additional notes available."}
           </Text>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.label}>
-            Issue / Task Notes
-          </Text>
-          <Text style={styles.value}>
-            {visit?.issue || "-"}
-          </Text>
-        </View>
-
+        {/* IMAGE */}
         {visit?.beforeImage ? (
-          <View style={styles.section}>
-            <Text style={styles.label}>
+          <View
+            style={styles.card}
+          >
+            <Text
+              style={
+                styles.sectionTitle
+              }
+            >
               Existing Condition
             </Text>
 
@@ -107,104 +204,227 @@ export default function StepApproval({
               source={{
                 uri: visit.beforeImage,
               }}
-              style={styles.image}
+              style={
+                styles.image
+              }
             />
           </View>
         ) : null}
 
+        {/* CTA */}
         <TouchableOpacity
           style={styles.btn}
           onPress={onNext}
+          activeOpacity={0.9}
         >
-          <Text style={styles.btnText}>
+          <Text
+            style={
+              styles.btnText
+            }
+          >
             Approve & Continue
           </Text>
+
+          <Ionicons
+            name="arrow-forward"
+            size={18}
+            color="#fff"
+          />
         </TouchableOpacity>
-      </View>
-    </ScrollView>
+      </ScrollView>
     </Screen>
   );
 }
 
-const styles = StyleSheet.create({
-  wrap: {
-    paddingBottom: 30,
-  },
+function InfoRow({
+  icon,
+  label,
+  value,
+}: any) {
+  return (
+    <View style={styles.infoRow}>
+      <View
+        style={
+          styles.iconWrap
+        }
+      >
+        <Ionicons
+          name={icon}
+          size={18}
+          color={
+            Theme.colors.primary
+          }
+        />
+      </View>
 
-  card: {
-    backgroundColor: "#fff",
-    padding: 10,
-    borderRadius: 18,
-  },
+      <View
+        style={{
+          flex: 1,
+        }}
+      >
+        <Text
+          style={
+            styles.label
+          }
+        >
+          {label}
+        </Text>
 
-  title: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: Theme.colors.text,
-    marginBottom: 14,
-  },
+        <Text
+          style={
+            styles.value
+          }
+        >
+          {value}
+        </Text>
+      </View>
+    </View>
+  );
+}
 
-  badge: {
-    alignSelf: "flex-start",
-    backgroundColor: "#ECFDF3",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    marginBottom: 18,
-  },
+const styles =
+  StyleSheet.create({
+    hero: {
+      backgroundColor:
+        Theme.colors.secondary,
+      borderRadius: 22,
+      padding: 20,
+      marginBottom: 16,
+    },
 
-  badgeText: {
-    color: "#027A48",
-    fontWeight: "700",
-    fontSize: 12,
-  },
+    heroIcon: {
+      width: 52,
+      height: 52,
+      borderRadius: 16,
+      backgroundColor:
+        "rgba(255,255,255,0.15)",
+      justifyContent:
+        "center",
+      alignItems:
+        "center",
+      marginBottom: 14,
+    },
 
-  section: {
-    marginBottom: 14,
-  },
+    heroTitle: {
+      fontSize: 24,
+      fontWeight: "800",
+      color: "#fff",
+    },
 
-  row: {
-    flexDirection: "row",
-    gap: 12,
-    marginBottom: 14,
-  },
+    heroSub: {
+      color: "#CBD5E1",
+      marginTop: 6,
+      lineHeight: 22,
+      fontSize: 14,
+    },
 
-  half: {
-    flex: 1,
-  },
+    card: {
+      backgroundColor:
+        "#fff",
+      borderRadius: 20,
+      padding: 18,
+      marginBottom: 16,
+      borderWidth: 1,
+      borderColor:
+        "#EEF2F7",
+    },
 
-  label: {
-    fontSize: 12,
-    color: Theme.colors.gray,
-    marginBottom: 4,
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-  },
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: "800",
+      color:
+        Theme.colors.text,
+      marginBottom: 14,
+    },
 
-  value: {
-    fontSize: 15,
-    color: Theme.colors.text,
-    fontWeight: "600",
-  },
+    statusRow: {
+      flexDirection: "row",
+      justifyContent:
+        "space-between",
+      alignItems:
+        "center",
+    },
 
-  image: {
-    width: "100%",
-    height: 180,
-    borderRadius: 14,
-    marginTop: 8,
-  },
+    badge: {
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: 999,
+    },
 
-  btn: {
-    marginTop: 18,
-    backgroundColor: Theme.colors.primary,
-    padding: 15,
-    borderRadius: 14,
-  },
+    badgeText: {
+      fontSize: 12,
+      fontWeight: "800",
+    },
 
-  btnText: {
-    color: "#fff",
-    textAlign: "center",
-    fontWeight: "700",
-    fontSize: 15,
-  },
-});
+    infoRow: {
+      flexDirection: "row",
+      gap: 12,
+      marginBottom: 16,
+      alignItems:
+        "flex-start",
+    },
+
+    iconWrap: {
+      width: 38,
+      height: 38,
+      borderRadius: 12,
+      backgroundColor:
+        "#FFF7ED",
+      justifyContent:
+        "center",
+      alignItems:
+        "center",
+    },
+
+    label: {
+      fontSize: 12,
+      color:
+        Theme.colors.subtext,
+      marginBottom: 3,
+      fontWeight: "700",
+      textTransform:
+        "uppercase",
+      letterSpacing: 0.4,
+    },
+
+    value: {
+      fontSize: 15,
+      fontWeight: "700",
+      color:
+        Theme.colors.text,
+      lineHeight: 22,
+    },
+
+    notesText: {
+      fontSize: 15,
+      lineHeight: 24,
+      color:
+        Theme.colors.text,
+    },
+
+    image: {
+      width: "100%",
+      height: 220,
+      borderRadius: 18,
+    },
+
+    btn: {
+      backgroundColor:
+        Theme.colors.primary,
+      padding: 17,
+      borderRadius: 18,
+      flexDirection: "row",
+      justifyContent:
+        "center",
+      alignItems:
+        "center",
+      gap: 8,
+      marginTop: 4,
+    },
+
+    btnText: {
+      color: "#fff",
+      fontWeight: "800",
+      fontSize: 15,
+    },
+  });

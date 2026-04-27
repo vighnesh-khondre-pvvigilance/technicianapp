@@ -1,20 +1,34 @@
 // app/(public)/training.tsx
 
-import { useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import * as Linking from "expo-linking";
 import { useRouter } from "expo-router";
+import { useFocusEffect } from "@react-navigation/native";
 
-import { quizQuestions } from "../../src/data/quizQuestions";
 import Screen from "../../src/components/Screen";
 import { Theme } from "../../src/theme/theme";
+import { quizQuestions } from "../../src/data/quizQuestions";
+
+const PROFILE_KEY = "profileSubmitted";
+const QUIZ_DONE_KEY = "trainingQuizCompleted";
+const QUIZ_SCORE_KEY = "trainingQuizScore";
+
+const PASS_SCORE = 8;
 
 const trainingModules = [
   {
@@ -58,70 +72,248 @@ export default function TrainingScreen() {
   const router = useRouter();
 
   const [step, setStep] = useState(0);
-  const [answers, setAnswers] =
-    useState<number[]>([]);
-  const [completed, setCompleted] =
-    useState(false);
+  const [answers, setAnswers] = useState<number[]>([]);
+  const [completed, setCompleted] = useState(false);
+  const [profileDone, setProfileDone] = useState(false);
+  const [savedScore, setSavedScore] =
+    useState<number | null>(null);
+  const [loading, setLoading] =
+    useState(true);
 
-  const current =
-    quizQuestions[step];
+  const current = quizQuestions[step];
 
-  const score = useMemo(() => {
+  /* --------------------------------------- */
+  /* LOAD DATA WHEN SCREEN FOCUSED          */
+  /* --------------------------------------- */
+  const loadSavedData = async () => {
+    try {
+      setLoading(true);
+
+      const profile =
+        await AsyncStorage.getItem(
+          PROFILE_KEY
+        );
+
+      const done =
+        await AsyncStorage.getItem(
+          QUIZ_DONE_KEY
+        );
+
+      const score =
+        await AsyncStorage.getItem(
+          QUIZ_SCORE_KEY
+        );
+
+      setProfileDone(
+        profile === "true"
+      );
+
+      setCompleted(
+        done === "true"
+      );
+
+      if (score !== null) {
+        setSavedScore(
+          Number(score)
+        );
+      } else {
+        setSavedScore(null);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      loadSavedData();
+    }, [])
+  );
+
+  useEffect(() => {
+    loadSavedData();
+  }, []);
+
+  /* --------------------------------------- */
+  /* SCORE                                  */
+  /* --------------------------------------- */
+  const liveScore = useMemo(() => {
     return answers.filter(
       (item, index) =>
         item ===
-        quizQuestions[index]?.answer
+        quizQuestions[index]
+          ?.answer
     ).length;
   }, [answers]);
 
-  const progress =
-    ((step +
-      (completed ? 1 : 0)) /
-      quizQuestions.length) *
-    100;
+  const score =
+    savedScore !== null
+      ? savedScore
+      : liveScore;
 
+  const passed =
+    completed &&
+    score >= PASS_SCORE;
+
+  const progress =
+    completed
+      ? 100
+      : ((step + 1) /
+          quizQuestions.length) *
+        100;
+
+  /* --------------------------------------- */
+  /* VIDEO                                  */
+  /* --------------------------------------- */
   const openVideo = async (
     url: string
   ) => {
     const supported =
-      await Linking.canOpenURL(url);
+      await Linking.canOpenURL(
+        url
+      );
 
     if (supported) {
-      await Linking.openURL(url);
+      await Linking.openURL(
+        url
+      );
     }
   };
 
-  const selectAnswer = (
-    index: number
-  ) => {
-    const updated = [...answers];
-    updated[step] = index;
-    setAnswers(updated);
+  /* --------------------------------------- */
+  /* QUIZ                                   */
+  /* --------------------------------------- */
+  const selectAnswer =
+    async (
+      index: number
+    ) => {
+      const updated = [
+        ...answers,
+      ];
 
-    if (
-      step <
-      quizQuestions.length - 1
-    ) {
-      setStep(step + 1);
-    } else {
+      updated[step] = index;
+
+      setAnswers(updated);
+
+      if (
+        step <
+        quizQuestions.length -
+          1
+      ) {
+        setStep(
+          step + 1
+        );
+        return;
+      }
+
+      const finalScore =
+        updated.filter(
+          (
+            item,
+            i
+          ) =>
+            item ===
+            quizQuestions[
+              i
+            ]?.answer
+        ).length;
+
+      setSavedScore(
+        finalScore
+      );
+
       setCompleted(true);
-    }
-  };
 
+      await AsyncStorage.multiSet(
+        [
+          [
+            QUIZ_DONE_KEY,
+            "true",
+          ],
+          [
+            QUIZ_SCORE_KEY,
+            String(
+              finalScore
+            ),
+          ],
+        ]
+      );
+    };
+
+  const restartQuiz =
+    async () => {
+      Alert.alert(
+        "Restart Quiz",
+        "Do you want to reset your quiz attempt?",
+        [
+          {
+            text: "Cancel",
+            style:
+              "cancel",
+          },
+          {
+            text: "Restart",
+            onPress:
+              async () => {
+                setStep(0);
+                setAnswers(
+                  []
+                );
+                setCompleted(
+                  false
+                );
+                setSavedScore(
+                  null
+                );
+
+                await AsyncStorage.multiRemove(
+                  [
+                    QUIZ_DONE_KEY,
+                    QUIZ_SCORE_KEY,
+                  ]
+                );
+              },
+          },
+        ]
+      );
+    };
+
+  /* --------------------------------------- */
+  /* STATUS                                 */
+  /* --------------------------------------- */
   const stages = [
     "Quick Join Complete",
-    "Profile Submitted",
+
+    profileDone
+      ? "Profile Submitted"
+      : "Profile Pending",
+
     completed
       ? "Training Complete"
       : "Training Pending",
+
     completed
       ? "Verification Pending"
       : "Waiting",
-    score >= 8
+
+    passed
       ? "Approved"
+      : completed
+      ? "Review Pending"
       : "Pending Approval",
   ];
 
+  const technicianId =
+    "PVP" +
+    (
+      1000 + score * 12
+    ).toString();
+
+  /* --------------------------------------- */
+  /* UI                                     */
+  /* --------------------------------------- */
   return (
     <Screen>
       <ScrollView
@@ -132,50 +324,74 @@ export default function TrainingScreen() {
           styles.container
         }
       >
-        {/* Hero */}
+        {/* HERO */}
         <View style={styles.hero}>
           <View
-            style={styles.heroCircle1}
+            style={
+              styles.heroCircle1
+            }
           />
           <View
-            style={styles.heroCircle2}
+            style={
+              styles.heroCircle2
+            }
           />
 
-          <Text style={styles.heroTag}>
+          <Text
+            style={
+              styles.heroTag
+            }
+          >
             Training Center
           </Text>
 
-          <Text style={styles.heading}>
-            Learn & Get Verified
+          <Text
+            style={
+              styles.heading
+            }
+          >
+            Learn & Get
+            Verified
           </Text>
 
           <Text
-            style={styles.subheading}
+            style={
+              styles.subheading
+            }
           >
-            Complete training,
-            pass the quiz, and
-            move toward technician
-            approval.
+            Complete your
+            profile, finish
+            training, pass
+            the quiz and get
+            approved.
           </Text>
         </View>
 
-        {/* Modules */}
+        {/* MODULES */}
         <View style={styles.card}>
           <Text
             style={
               styles.sectionTitle
             }
           >
-            Training Modules
+            Training
+            Modules
           </Text>
 
           {trainingModules.map(
-            (item, index) => (
+            (
+              item,
+              index
+            ) => (
               <TouchableOpacity
-                key={item.id}
-                activeOpacity={0.88}
+                key={
+                  item.id
+                }
                 style={
                   styles.moduleRow
+                }
+                activeOpacity={
+                  0.88
                 }
                 onPress={() =>
                   openVideo(
@@ -192,9 +408,12 @@ export default function TrainingScreen() {
                     name={
                       item.icon as any
                     }
-                    size={18}
+                    size={
+                      18
+                    }
                     color={
-                      Theme.colors
+                      Theme
+                        .colors
                         .primary
                     }
                   />
@@ -210,7 +429,9 @@ export default function TrainingScreen() {
                       styles.rowText
                     }
                   >
-                    {item.title}
+                    {
+                      item.title
+                    }
                   </Text>
 
                   <Text
@@ -219,8 +440,12 @@ export default function TrainingScreen() {
                     }
                   >
                     Module{" "}
-                    {index + 1} •{" "}
-                    {item.time}
+                    {index +
+                      1}{" "}
+                    •{" "}
+                    {
+                      item.time
+                    }
                   </Text>
                 </View>
 
@@ -231,7 +456,9 @@ export default function TrainingScreen() {
                 >
                   <Ionicons
                     name="logo-youtube"
-                    size={18}
+                    size={
+                      18
+                    }
                     color="#FF0000"
                   />
                 </View>
@@ -240,10 +467,14 @@ export default function TrainingScreen() {
           )}
         </View>
 
-        {/* Profile Button */}
+        {/* PROFILE */}
         <TouchableOpacity
-          style={styles.profileBtn}
-          activeOpacity={0.88}
+          style={
+            styles.profileBtn
+          }
+          activeOpacity={
+            0.88
+          }
           onPress={() =>
             router.push(
               "/ProfileForm"
@@ -261,10 +492,17 @@ export default function TrainingScreen() {
               }
             >
               <Ionicons
-                name="person-add-outline"
-                size={18}
+                name={
+                  profileDone
+                    ? "checkmark-circle-outline"
+                    : "person-add-outline"
+                }
+                size={
+                  18
+                }
                 color={
-                  Theme.colors
+                  Theme
+                    .colors
                     .primary
                 }
               />
@@ -276,7 +514,9 @@ export default function TrainingScreen() {
                   styles.profileTitle
                 }
               >
-                Complete Profile
+                {profileDone
+                  ? "Update Profile"
+                  : "Complete Profile"}
               </Text>
 
               <Text
@@ -284,9 +524,9 @@ export default function TrainingScreen() {
                   styles.profileSub
                 }
               >
-                Submit details to
-                unlock training
-                approval
+                {profileDone
+                  ? "Your profile is submitted"
+                  : "Submit details to continue"}
               </Text>
             </View>
           </View>
@@ -298,15 +538,37 @@ export default function TrainingScreen() {
           />
         </TouchableOpacity>
 
-        {/* Quiz */}
+        {/* QUIZ */}
         <View style={styles.card}>
-          <Text
+          <View
             style={
-              styles.sectionTitle
+              styles.rowBetween
             }
           >
-            Quick Quiz
-          </Text>
+            <Text
+              style={
+                styles.sectionTitle
+              }
+            >
+              Quick Quiz
+            </Text>
+
+            {completed && (
+              <TouchableOpacity
+                onPress={
+                  restartQuiz
+                }
+              >
+                <Text
+                  style={
+                    styles.resetText
+                  }
+                >
+                  Restart
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
 
           <View
             style={
@@ -331,7 +593,9 @@ export default function TrainingScreen() {
                 }
               >
                 Question{" "}
-                {step + 1} of{" "}
+                {step +
+                  1}{" "}
+                of{" "}
                 {
                   quizQuestions.length
                 }
@@ -342,7 +606,9 @@ export default function TrainingScreen() {
                   styles.question
                 }
               >
-                {current.question}
+                {
+                  current.question
+                }
               </Text>
 
               {current.options.map(
@@ -351,7 +617,9 @@ export default function TrainingScreen() {
                   index
                 ) => (
                   <TouchableOpacity
-                    key={index}
+                    key={
+                      index
+                    }
                     style={
                       styles.option
                     }
@@ -380,11 +648,20 @@ export default function TrainingScreen() {
                 }
               >
                 <Ionicons
-                  name="trophy-outline"
-                  size={22}
+                  name={
+                    passed
+                      ? "trophy-outline"
+                      : "alert-circle-outline"
+                  }
+                  size={24}
                   color={
-                    Theme.colors
-                      .primary
+                    passed
+                      ? Theme
+                          .colors
+                          .primary
+                      : Theme
+                          .colors
+                          .danger
                   }
                 />
 
@@ -393,7 +670,8 @@ export default function TrainingScreen() {
                     styles.score
                   }
                 >
-                  Score: {score}/
+                  Score:{" "}
+                  {score}/
                   {
                     quizQuestions.length
                   }
@@ -401,25 +679,37 @@ export default function TrainingScreen() {
               </View>
 
               <Text
-                style={
-                  styles.saved
-                }
+                style={[
+                  styles.saved,
+                  {
+                    color:
+                      passed
+                        ? Theme
+                            .colors
+                            .success
+                        : Theme
+                            .colors
+                            .danger,
+                  },
+                ]}
               >
-                Result saved
-                successfully.
+                {passed
+                  ? "Congratulations! You passed."
+                  : "You can restart and improve score."}
               </Text>
             </>
           )}
         </View>
 
-        {/* Status */}
+        {/* STATUS */}
         <View style={styles.card}>
           <Text
             style={
               styles.sectionTitle
             }
           >
-            Onboarding Status
+            Onboarding
+            Status
           </Text>
 
           {stages.map(
@@ -432,11 +722,15 @@ export default function TrainingScreen() {
                   "Complete"
                 ) ||
                 item ===
+                  "Profile Submitted" ||
+                item ===
                   "Approved";
 
               return (
                 <View
-                  key={index}
+                  key={
+                    index
+                  }
                   style={
                     styles.statusRow
                   }
@@ -469,30 +763,31 @@ export default function TrainingScreen() {
             }
           )}
 
-          {score >= 8 &&
-            completed && (
-              <View
+          {passed && (
+            <View
+              style={
+                styles.idBox
+              }
+            >
+              <Text
                 style={
-                  styles.idBox
+                  styles.idLabel
                 }
               >
-                <Text
-                  style={
-                    styles.idLabel
-                  }
-                >
-                  Technician ID
-                </Text>
+                Technician ID
+              </Text>
 
-                <Text
-                  style={
-                    styles.idValue
-                  }
-                >
-                  PVP1024
-                </Text>
-              </View>
-            )}
+              <Text
+                style={
+                  styles.idValue
+                }
+              >
+                {
+                  technicianId
+                }
+              </Text>
+            </View>
+          )}
         </View>
       </ScrollView>
     </Screen>
@@ -576,8 +871,7 @@ const styles =
       marginBottom: 16,
       borderWidth: 1,
       borderColor:
-        Theme.colors
-          .border,
+        Theme.colors.border,
     },
 
     sectionTitle: {
@@ -586,6 +880,20 @@ const styles =
       color:
         Theme.colors.text,
       marginBottom: 14,
+    },
+
+    rowBetween: {
+      flexDirection: "row",
+      justifyContent:
+        "space-between",
+      alignItems:
+        "center",
+    },
+
+    resetText: {
+      fontWeight: "700",
+      color:
+        Theme.colors.info,
     },
 
     moduleRow: {
@@ -630,8 +938,7 @@ const styles =
       marginTop: 3,
       fontSize: 12,
       color:
-        Theme.colors
-          .subtext,
+        Theme.colors.subtext,
     },
 
     profileBtn: {
@@ -642,12 +949,11 @@ const styles =
       marginBottom: 16,
       borderWidth: 1,
       borderColor:
-        Theme.colors
-          .border,
+        Theme.colors.border,
       flexDirection: "row",
-      alignItems: "center",
       justifyContent:
         "space-between",
+      alignItems: "center",
     },
 
     profileLeft: {
@@ -660,13 +966,13 @@ const styles =
       width: 46,
       height: 46,
       borderRadius: 16,
-      backgroundColor:
-        "rgba(245,158,11,0.12)",
       justifyContent:
         "center",
       alignItems:
         "center",
       marginRight: 12,
+      backgroundColor:
+        "rgba(245,158,11,0.12)",
     },
 
     profileTitle: {
@@ -680,8 +986,7 @@ const styles =
       marginTop: 4,
       fontSize: 13,
       color:
-        Theme.colors
-          .subtext,
+        Theme.colors.subtext,
     },
 
     progressTrack: {
@@ -696,16 +1001,14 @@ const styles =
     progressFill: {
       height: "100%",
       backgroundColor:
-        Theme.colors
-          .primary,
+        Theme.colors.primary,
     },
 
     stepText: {
       fontSize: 12,
-      color:
-        Theme.colors
-          .subtext,
       marginBottom: 8,
+      color:
+        Theme.colors.subtext,
     },
 
     question: {
@@ -720,8 +1023,7 @@ const styles =
     option: {
       borderWidth: 1,
       borderColor:
-        Theme.colors
-          .border,
+        Theme.colors.border,
       borderRadius: 16,
       padding: 14,
       marginBottom: 10,
@@ -731,9 +1033,9 @@ const styles =
 
     optionText: {
       fontSize: 14,
+      fontWeight: "600",
       color:
         Theme.colors.text,
-      fontWeight: "600",
     },
 
     resultBox: {
@@ -746,15 +1048,11 @@ const styles =
       fontSize: 22,
       fontWeight: "800",
       color:
-        Theme.colors
-          .primary,
+        Theme.colors.primary,
     },
 
     saved: {
       marginTop: 8,
-      color:
-        Theme.colors
-          .success,
       fontWeight: "700",
     },
 

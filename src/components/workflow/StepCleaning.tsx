@@ -1,6 +1,6 @@
 // src/components/workflow/StepCleaning.tsx
 
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -9,10 +9,13 @@ import {
   ScrollView,
   Alert,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons } from "@expo/vector-icons";
 import { Theme } from "../../theme/theme";
+import Screen from "../Screen";
 
 const MAX_LIMIT = 20;
 
@@ -22,53 +25,64 @@ export default function StepCleaning({
   onBack,
   onSubmit,
 }: any) {
-  const visitForm = form?.visitForm || {};
+  const [loading, setLoading] =
+    useState(false);
 
-  const cleaning = form?.cleaning || {
-    required: false,
-    done: false,
-    before: [],
-    after: [],
-  };
+  const visitForm =
+    form?.visitForm || {};
 
-  /* Toggle Required */
-  const toggleRequired = () => {
-    updateForm({
-      cleaning: {
-        ...cleaning,
-        required: !cleaning.required,
-      },
-    });
-  };
+  const cleaning =
+    form?.cleaning || {
+      required: false,
+      done: false,
+      before: [],
+      after: [],
+    };
 
-  /* Toggle Done */
-  const toggleDone = () => {
-    updateForm({
-      cleaning: {
-        ...cleaning,
-        done: !cleaning.done,
-      },
-    });
-  };
-
-  /* Add Photo */
-  const savePhoto = (
-    type: "before" | "after",
-    uri: string
+  const updateCleaning = (
+    data: any
   ) => {
     updateForm({
       cleaning: {
         ...cleaning,
-        [type]: [
-          ...cleaning[type],
-          uri,
-        ],
+        ...data,
       },
     });
   };
 
+  /* Toggle Cleaning Cycle */
+  const toggleRequired =
+    () =>
+      updateCleaning({
+        required:
+          !cleaning.required,
+      });
+
+  /* Toggle Completed */
+  const toggleDone = () =>
+    updateCleaning({
+      done: !cleaning.done,
+    });
+
+  /* Save Photo */
+  const savePhoto = (
+    type:
+      | "before"
+      | "after",
+    uri: string
+  ) => {
+    updateCleaning({
+      [type]: [
+        ...cleaning[type],
+        uri,
+      ],
+    });
+  };
+
   const checkLimit = (
-    type: "before" | "after"
+    type:
+      | "before"
+      | "after"
   ) => {
     if (
       cleaning[type].length >=
@@ -83,8 +97,11 @@ export default function StepCleaning({
     return false;
   };
 
+  /* Gallery */
   const pickImage = async (
-    type: "before" | "after"
+    type:
+      | "before"
+      | "after"
   ) => {
     const permission =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -92,20 +109,23 @@ export default function StepCleaning({
     if (!permission.granted) {
       Alert.alert(
         "Permission Required",
-        "Please allow gallery access."
+        "Allow gallery access."
       );
       return;
     }
 
-    if (checkLimit(type)) return;
+    if (checkLimit(type))
+      return;
 
     const result =
-      await ImagePicker.launchImageLibraryAsync({
-        mediaTypes:
-          ImagePicker.MediaTypeOptions.Images,
-        quality: 0.8,
-        allowsEditing: true,
-      });
+      await ImagePicker.launchImageLibraryAsync(
+        {
+          mediaTypes:
+            ImagePicker.MediaTypeOptions.Images,
+          quality: 0.8,
+          allowsEditing: true,
+        }
+      );
 
     if (!result.canceled) {
       savePhoto(
@@ -115,8 +135,11 @@ export default function StepCleaning({
     }
   };
 
+  /* Camera */
   const openCamera = async (
-    type: "before" | "after"
+    type:
+      | "before"
+      | "after"
   ) => {
     const permission =
       await ImagePicker.requestCameraPermissionsAsync();
@@ -124,18 +147,21 @@ export default function StepCleaning({
     if (!permission.granted) {
       Alert.alert(
         "Permission Required",
-        "Please allow camera access."
+        "Allow camera access."
       );
       return;
     }
 
-    if (checkLimit(type)) return;
+    if (checkLimit(type))
+      return;
 
     const result =
-      await ImagePicker.launchCameraAsync({
-        quality: 0.8,
-        allowsEditing: true,
-      });
+      await ImagePicker.launchCameraAsync(
+        {
+          quality: 0.8,
+          allowsEditing: true,
+        }
+      );
 
     if (!result.canceled) {
       savePhoto(
@@ -146,7 +172,9 @@ export default function StepCleaning({
   };
 
   const addPhoto = (
-    type: "before" | "after"
+    type:
+      | "before"
+      | "after"
   ) => {
     Alert.alert(
       "Upload Photo",
@@ -155,50 +183,110 @@ export default function StepCleaning({
         {
           text: "Camera",
           onPress: () =>
-            openCamera(type),
+            openCamera(
+              type
+            ),
         },
         {
           text: "Gallery",
           onPress: () =>
-            pickImage(type),
+            pickImage(
+              type
+            ),
         },
         {
           text: "Cancel",
-          style: "cancel",
+          style:
+            "cancel",
         },
       ]
     );
   };
 
   const removePhoto = (
-    type: "before" | "after",
+    type:
+      | "before"
+      | "after",
     index: number
   ) => {
-    const updated =
-      cleaning[type].filter(
-        (_: any, i: number) =>
-          i !== index
-      );
-
-    updateForm({
-      cleaning: {
-        ...cleaning,
-        [type]: updated,
-      },
+    updateCleaning({
+      [type]:
+        cleaning[type].filter(
+          (
+            _: any,
+            i: number
+          ) =>
+            i !== index
+        ),
     });
   };
+
+  /* Submit */
+  const handleSubmit =
+    async () => {
+      if (
+        cleaning.required
+      ) {
+        if (
+          cleaning.before
+            .length === 0
+        ) {
+          Alert.alert(
+            "Required",
+            "Upload before cleaning photos."
+          );
+          return;
+        }
+
+        if (
+          cleaning.after
+            .length === 0
+        ) {
+          Alert.alert(
+            "Required",
+            "Upload after cleaning photos."
+          );
+          return;
+        }
+
+        if (
+          !cleaning.done
+        ) {
+          Alert.alert(
+            "Required",
+            "Confirm cleaning completed."
+          );
+          return;
+        }
+      }
+
+      setLoading(true);
+
+      setTimeout(() => {
+        setLoading(false);
+        onSubmit();
+      }, 1500);
+    };
 
   const PhotoSection = ({
     title,
     type,
   }: any) => (
-    <View style={styles.section}>
-      <View style={styles.head}>
-        <Text style={styles.sectionTitle}>
+    <View style={styles.card}>
+      <View style={styles.top}>
+        <Text
+          style={
+            styles.cardTitle
+          }
+        >
           {title}
         </Text>
 
-        <Text style={styles.count}>
+        <Text
+          style={
+            styles.count
+          }
+        >
           {
             cleaning[type]
               .length
@@ -208,13 +296,26 @@ export default function StepCleaning({
       </View>
 
       <TouchableOpacity
-        style={styles.uploadBtn}
+        style={
+          styles.uploadBox
+        }
         onPress={() =>
           addPhoto(type)
         }
       >
-        <Text style={styles.uploadText}>
-          + Add Photo
+        <Ionicons
+          name="camera-outline"
+          size={24}
+          color={
+            Theme.colors.primary
+          }
+        />
+        <Text
+          style={
+            styles.uploadText
+          }
+        >
+          Add Photo
         </Text>
       </TouchableOpacity>
 
@@ -246,7 +347,7 @@ export default function StepCleaning({
 
               <TouchableOpacity
                 style={
-                  styles.removeIcon
+                  styles.remove
                 }
                 onPress={() =>
                   removePhoto(
@@ -255,15 +356,11 @@ export default function StepCleaning({
                   )
                 }
               >
-                <Text
-                  style={{
-                    color:
-                      "#fff",
-                    fontSize: 10,
-                  }}
-                >
-                  ✕
-                </Text>
+                <Ionicons
+                  name="close"
+                  size={14}
+                  color="#fff"
+                />
               </TouchableOpacity>
             </View>
           )
@@ -273,55 +370,82 @@ export default function StepCleaning({
   );
 
   return (
-    <ScrollView
-      showsVerticalScrollIndicator={
-        false
-      }
-      contentContainerStyle={{
-        paddingBottom: 30,
-      }}
-    >
-      <View style={styles.card}>
-        <Text style={styles.title}>
-          Final Review
-        </Text>
-
-        {/* Summary */}
-        <View style={styles.summary}>
-          <Text style={styles.label}>
-            Inverter
-          </Text>
-          <Text style={styles.value}>
-            {
-              visitForm.inverterStatus
+    <Screen>
+      <ScrollView
+        showsVerticalScrollIndicator={
+          false
+        }
+        contentContainerStyle={{
+          paddingBottom: 30,
+        }}
+      >
+        {/* HEADER */}
+        <LinearGradient
+          colors={[
+            "#0F172A",
+            "#1E293B",
+          ]}
+          style={
+            styles.header
+          }
+        >
+          <Text
+            style={
+              styles.headerTitle
             }
-          </Text>
-
-          <Text style={styles.label}>
-            Generation
-          </Text>
-          <Text style={styles.value}>
-            {
-              visitForm.generationReading
-            }
+          >
+            Cleaning Confirmation
           </Text>
 
-          <Text style={styles.label}>
-            Technician
-          </Text>
-          <Text style={styles.value}>
-            {
-              visitForm.technicianId
+          <Text
+            style={
+              styles.headerSub
             }
+          >
+            Final visit review &
+            site cleaning status
           </Text>
+        </LinearGradient>
+
+        {/* SUMMARY */}
+        <View style={styles.card}>
+          <Text
+            style={
+              styles.cardTitle
+            }
+          >
+            Visit Summary
+          </Text>
+
+          <Row
+            label="Technician"
+            value={
+              visitForm.technicianId ||
+              "-"
+            }
+          />
+          <Row
+            label="Inverter"
+            value={
+              visitForm.inverterStatus ||
+              "-"
+            }
+          />
+          <Row
+            label="Generation"
+            value={
+              visitForm.generationReading ||
+              "-"
+            }
+          />
         </View>
 
-        {/* Required */}
+        {/* TOGGLE */}
         <TouchableOpacity
           style={[
             styles.toggle,
             cleaning.required &&
-              styles.activeToggle,
+              styles.active,
           ]}
           onPress={
             toggleRequired
@@ -330,19 +454,21 @@ export default function StepCleaning({
           <Text
             style={[
               styles.toggleText,
-              cleaning.required && {
-                color:
-                  "#fff",
-              },
+              cleaning.required &&
+                {
+                  color:
+                    "#fff",
+                },
             ]}
           >
             {cleaning.required
               ? "✓ "
-              : ""}
-            Cleaning Required
+              : "☐ "}
+            Cleaning Cycle
           </Text>
         </TouchableOpacity>
 
+        {/* SHOW ONLY IF CHECKED */}
         {cleaning.required && (
           <>
             <PhotoSection
@@ -359,7 +485,7 @@ export default function StepCleaning({
               style={[
                 styles.toggle,
                 cleaning.done &&
-                  styles.activeToggle,
+                  styles.done,
               ]}
               onPress={
                 toggleDone
@@ -368,22 +494,23 @@ export default function StepCleaning({
               <Text
                 style={[
                   styles.toggleText,
-                  cleaning.done && {
-                    color:
-                      "#fff",
-                  },
+                  cleaning.done &&
+                    {
+                      color:
+                        "#fff",
+                    },
                 ]}
               >
                 {cleaning.done
                   ? "✓ "
-                  : ""}
+                  : "☐ "}
                 Cleaning Completed
               </Text>
             </TouchableOpacity>
           </>
         )}
 
-        {/* Buttons */}
+        {/* BUTTONS */}
         <View style={styles.row}>
           <TouchableOpacity
             style={
@@ -405,7 +532,10 @@ export default function StepCleaning({
               flex: 1,
             }}
             onPress={
-              onSubmit
+              handleSubmit
+            }
+            disabled={
+              loading
             }
           >
             <LinearGradient
@@ -417,55 +547,104 @@ export default function StepCleaning({
                 styles.submitBtn
               }
             >
-              <Text
-                style={
-                  styles.submitText
-                }
-              >
-                Submit Visit
-              </Text>
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text
+                  style={
+                    styles.submitText
+                  }
+                >
+                  Submit Visit
+                </Text>
+              )}
             </LinearGradient>
           </TouchableOpacity>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </Screen>
+  );
+}
+
+function Row({
+  label,
+  value,
+}: any) {
+  return (
+    <View style={styles.item}>
+      <Text
+        style={
+          styles.itemLabel
+        }
+      >
+        {label}
+      </Text>
+
+      <Text
+        style={
+          styles.itemValue
+        }
+      >
+        {value}
+      </Text>
+    </View>
   );
 }
 
 const styles =
   StyleSheet.create({
+    header: {
+      padding: 20,
+      borderRadius: 24,
+      marginBottom: 16,
+    },
+
+    headerTitle: {
+      color: "#fff",
+      fontSize: 24,
+      fontWeight: "800",
+    },
+
+    headerSub: {
+      color: "#CBD5E1",
+      marginTop: 6,
+    },
+
     card: {
       backgroundColor:
         "#fff",
       padding: 18,
-      borderRadius: 24,
+      borderRadius: 22,
+      marginBottom: 16,
+      borderWidth: 1,
+      borderColor:
+        "#EEF2F7",
     },
 
-    title: {
-      fontSize: 26,
+    cardTitle: {
+      fontSize: 16,
       fontWeight: "800",
-      marginBottom: 16,
       color:
         Theme.colors.text,
+      marginBottom: 12,
     },
 
-    summary: {
-      backgroundColor:
-        "#F8FAFC",
-      padding: 16,
-      borderRadius: 18,
-      marginBottom: 16,
+    item: {
+      flexDirection: "row",
+      justifyContent:
+        "space-between",
+      paddingVertical: 8,
+      borderBottomWidth: 1,
+      borderBottomColor:
+        "#F1F5F9",
     },
 
-    label: {
-      fontSize: 12,
+    itemLabel: {
       color:
         Theme.colors.subtext,
-      marginTop: 6,
     },
 
-    value: {
-      fontSize: 15,
+    itemValue: {
       fontWeight: "700",
       color:
         Theme.colors.text,
@@ -474,16 +653,21 @@ const styles =
     toggle: {
       backgroundColor:
         "#EEF2FF",
-      padding: 15,
+      padding: 16,
       borderRadius: 16,
-      marginBottom: 14,
+      marginBottom: 16,
       alignItems:
         "center",
     },
 
-    activeToggle: {
+    active: {
       backgroundColor:
         Theme.colors.primary,
+    },
+
+    done: {
+      backgroundColor:
+        "#16A34A",
     },
 
     toggleText: {
@@ -492,49 +676,37 @@ const styles =
         Theme.colors.text,
     },
 
-    section: {
-      marginBottom: 16,
-    },
-
-    head: {
+    top: {
       flexDirection: "row",
       justifyContent:
         "space-between",
       marginBottom: 10,
     },
 
-    sectionTitle: {
-      fontWeight: "700",
-      fontSize: 15,
-      color:
-        Theme.colors.text,
-    },
-
     count: {
-      fontSize: 12,
       color:
         Theme.colors.subtext,
+      fontSize: 12,
     },
 
-    uploadBtn: {
-      borderWidth: 1,
-      borderColor:
-        "#E5E7EB",
+    uploadBox: {
+      height: 110,
+      borderRadius: 18,
+      borderWidth: 1.5,
       borderStyle:
         "dashed",
-      padding: 14,
-      borderRadius: 16,
+      borderColor:
+        "#E5E7EB",
+      justifyContent:
+        "center",
       alignItems:
         "center",
       marginBottom: 12,
-      backgroundColor:
-        "#fff",
     },
 
     uploadText: {
+      marginTop: 8,
       fontWeight: "700",
-      color:
-        Theme.colors.text,
     },
 
     photoWrap: {
@@ -544,31 +716,31 @@ const styles =
     },
 
     photo: {
-      width: 92,
-      height: 92,
+      width: 95,
+      height: 95,
       borderRadius: 16,
     },
 
-    removeIcon: {
+    remove: {
       position:
         "absolute",
       top: 6,
       right: 6,
-      width: 22,
-      height: 22,
-      borderRadius: 11,
+      width: 24,
+      height: 24,
+      borderRadius: 12,
       backgroundColor:
         "rgba(0,0,0,0.6)",
-      alignItems:
-        "center",
       justifyContent:
+        "center",
+      alignItems:
         "center",
     },
 
     row: {
       flexDirection: "row",
       gap: 12,
-      marginTop: 10,
+      marginTop: 6,
     },
 
     backBtn: {
@@ -577,21 +749,17 @@ const styles =
       borderColor:
         "#E5E7EB",
       borderRadius: 16,
-      padding: 15,
+      padding: 16,
       alignItems:
-        "center",
-      justifyContent:
         "center",
     },
 
     backText: {
       fontWeight: "700",
-      color:
-        Theme.colors.text,
     },
 
     submitBtn: {
-      padding: 15,
+      padding: 16,
       borderRadius: 16,
       alignItems:
         "center",
