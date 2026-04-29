@@ -68,11 +68,10 @@ export default function TechnicianStories() {
             key={item.name}
             style={styles.card}
           >
+            {/* Header */}
             <View style={styles.topRow}>
               <View
-                style={
-                  styles.avatar
-                }
+                style={styles.avatar}
               >
                 <Text
                   style={
@@ -94,9 +93,7 @@ export default function TechnicianStories() {
               </View>
 
               <View
-                style={
-                  styles.info
-                }
+                style={styles.info}
               >
                 <Text
                   style={
@@ -117,6 +114,7 @@ export default function TechnicianStories() {
               </View>
             </View>
 
+            {/* Stars */}
             <View style={styles.stars}>
               {Array.from({
                 length:
@@ -127,12 +125,16 @@ export default function TechnicianStories() {
                     key={i}
                     name="star"
                     size={14}
-                    color="#F59E0B"
+                    color={
+                      Theme.colors
+                        .accent
+                    }
                   />
                 )
               )}
             </View>
 
+            {/* Quote */}
             <Text style={styles.quote}>
               “{item.quote}”
             </Text>
@@ -146,23 +148,23 @@ export default function TechnicianStories() {
 const styles =
   StyleSheet.create({
     section: {
-      marginBottom: 16,
+      marginBottom: 18,
     },
 
     kicker: {
       fontSize: 12,
-      fontWeight: "800",
+      fontWeight: "900",
       color:
         Theme.colors.primary,
       textTransform:
         "uppercase",
-      letterSpacing: 0.4,
+      letterSpacing: 0.7,
       marginBottom: 6,
     },
 
     title: {
       fontSize: 24,
-      fontWeight: "800",
+      fontWeight: "900",
       color:
         Theme.colors.text,
     },
@@ -171,24 +173,38 @@ const styles =
       marginTop: 8,
       marginBottom: 16,
       color:
-        Theme.colors.subtext,
-      lineHeight: 20,
+        Theme.colors.subText,
+      lineHeight: 21,
+      fontSize: 14,
     },
 
     scrollWrap: {
-      paddingRight: 8,
+      paddingRight: 6,
     },
 
     card: {
-      width: 300,
+      width: 305,
       backgroundColor:
-        Theme.colors.card,
-      borderRadius: 24,
+        Theme.colors.surface,
+      borderRadius:
+        Theme.radius.xl,
       padding: 18,
       marginRight: 14,
+
       borderWidth: 1,
       borderColor:
         Theme.colors.border,
+
+      shadowColor:
+        Theme.colors.shadow,
+      shadowOpacity: 0.06,
+      shadowRadius: 10,
+      shadowOffset: {
+        width: 0,
+        height: 5,
+      },
+
+      elevation: 3,
     },
 
     topRow: {
@@ -198,18 +214,20 @@ const styles =
     },
 
     avatar: {
-      width: 48,
-      height: 48,
-      borderRadius: 24,
+      width: 50,
+      height: 50,
+      borderRadius: 25,
       backgroundColor:
-        Theme.colors.secondary,
+        Theme.colors.primary,
       alignItems: "center",
       justifyContent:
         "center",
     },
 
     avatarText: {
-      color: "#fff",
+      color:
+        Theme.colors
+          .textInverse,
       fontWeight: "900",
       fontSize: 14,
     },
@@ -226,25 +244,26 @@ const styles =
     },
 
     meta: {
-      marginTop: 3,
+      marginTop: 4,
       fontSize: 12,
-      color:
-        Theme.colors.subtext,
       fontWeight: "600",
+      color:
+        Theme.colors.subText,
     },
 
     stars: {
       flexDirection: "row",
       gap: 4,
       marginTop: 14,
-      marginBottom: 10,
+      marginBottom: 12,
     },
 
     quote: {
-      color:
-        Theme.colors.text,
       fontSize: 14,
       lineHeight: 22,
       fontWeight: "500",
+      color:
+        Theme.colors
+          .textSecondary,
     },
   });

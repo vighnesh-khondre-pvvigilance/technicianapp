@@ -51,6 +51,7 @@ const roles = [
 export default function WhatWorkYoullDo() {
   return (
     <View style={styles.card}>
+      {/* Header */}
       <Text style={styles.kicker}>
         Your Role
       </Text>
@@ -61,9 +62,11 @@ export default function WhatWorkYoullDo() {
 
       <Text style={styles.sub}>
         Real field opportunities on
-        professional solar projects.
+        premium solar projects with
+        professional teams.
       </Text>
 
+      {/* Roles */}
       <View style={styles.grid}>
         {roles.map((role) => (
           <View
@@ -76,7 +79,7 @@ export default function WhatWorkYoullDo() {
                   name={
                     role.icon as any
                   }
-                  size={20}
+                  size={19}
                   color={
                     Theme.colors.primary
                   }
@@ -100,11 +103,20 @@ export default function WhatWorkYoullDo() {
                     styles.taskRow
                   }
                 >
-                  <Ionicons
-                    name="checkmark"
-                    size={14}
-                    color="#16A34A"
-                  />
+                  <View
+                    style={
+                      styles.checkWrap
+                    }
+                  >
+                    <Ionicons
+                      name="checkmark"
+                      size={12}
+                      color={
+                        Theme.colors.eco
+                      }
+                    />
+                  </View>
+
                   <Text
                     style={
                       styles.taskText
@@ -118,6 +130,19 @@ export default function WhatWorkYoullDo() {
           </View>
         ))}
       </View>
+
+      {/* Footer */}
+      <View style={styles.footer}>
+        <Ionicons
+          name="briefcase-outline"
+          size={15}
+          color={Theme.colors.accent}
+        />
+
+        <Text style={styles.footerText}>
+          Work assigned based on skill level
+        </Text>
+      </View>
     </View>
   );
 }
@@ -126,48 +151,70 @@ const styles =
   StyleSheet.create({
     card: {
       backgroundColor:
-        Theme.colors.card,
-      borderRadius: 24,
-      padding: 18,
-      marginBottom: 16,
+        Theme.colors.surface,
+      borderRadius:
+        Theme.radius.xl,
+      padding: 20,
+      marginBottom: 18,
+
       borderWidth: 1,
       borderColor:
         Theme.colors.border,
+
+      shadowColor:
+        Theme.colors.shadow,
+      shadowOpacity: 0.06,
+      shadowRadius: 10,
+      shadowOffset: {
+        width: 0,
+        height: 6,
+      },
+
+      elevation: 3,
     },
 
     kicker: {
-      fontSize: 12,
-      fontWeight: "800",
+      alignSelf: "flex-start",
+      fontSize: 11,
+      fontWeight: "900",
       color:
         Theme.colors.primary,
+      letterSpacing: 0.8,
       textTransform:
         "uppercase",
-      letterSpacing: 0.4,
+      backgroundColor:
+        Theme.colors.surfaceAlt,
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+      borderRadius: 999,
     },
 
     title: {
       fontSize: 24,
-      fontWeight: "800",
+      fontWeight: "900",
       color:
         Theme.colors.text,
-      marginTop: 6,
+      marginTop: 12,
+      letterSpacing: -0.4,
     },
 
     sub: {
       marginTop: 8,
-      marginBottom: 16,
+      marginBottom: 18,
       color:
-        Theme.colors.subtext,
-      lineHeight: 20,
+        Theme.colors.subText,
+      lineHeight: 21,
+      fontSize: 14,
+      fontWeight: "600",
     },
 
     grid: {
-      gap: 14,
+      gap: 12,
     },
 
     roleCard: {
       backgroundColor:
-        "#F8FAFC",
+        Theme.colors.surfaceAlt,
       borderRadius: 20,
       padding: 14,
     },
@@ -180,14 +227,17 @@ const styles =
     },
 
     iconWrap: {
-      width: 38,
-      height: 38,
-      borderRadius: 12,
+      width: 40,
+      height: 40,
+      borderRadius: 14,
       alignItems: "center",
       justifyContent:
         "center",
       backgroundColor:
-        "rgba(245,158,11,0.12)",
+        Theme.colors.surface,
+      borderWidth: 1,
+      borderColor:
+        Theme.colors.border,
     },
 
     roleTitle: {
@@ -202,13 +252,43 @@ const styles =
       flexDirection: "row",
       alignItems: "center",
       gap: 8,
-      marginTop: 8,
+      marginTop: 9,
+    },
+
+    checkWrap: {
+      width: 20,
+      height: 20,
+      borderRadius: 99,
+      alignItems: "center",
+      justifyContent:
+        "center",
+      backgroundColor:
+        Theme.colors.ecoSoft,
     },
 
     taskText: {
+      flex: 1,
       color:
-        Theme.colors.subtext,
+        Theme.colors.subText,
       fontSize: 13,
-      fontWeight: "600",
+      fontWeight: "700",
+    },
+
+    footer: {
+      marginTop: 16,
+      paddingTop: 14,
+      borderTopWidth: 1,
+      borderTopColor:
+        Theme.colors.border,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+    },
+
+    footerText: {
+      fontSize: 12,
+      fontWeight: "700",
+      color:
+        Theme.colors.subText,
     },
   });

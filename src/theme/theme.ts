@@ -1,22 +1,45 @@
 export const Theme = {
   colors: {
-    primary: "#F59E0B",     // Slightly richer solar amber
-    secondary: "#0F172A",   // Stronger professional navy
-    background: "#F8FAFC",
-    card: "#FFFFFF",
+  // ━━━ Primary (Navy - Premium UI) ━━━
+  primary: "#0B1F3B",
+  primaryMid: "#1E3A5F",
+  primarySoft: "#E8EEF8",
 
-    text: "#111827",
-    subtext: "#6B7280",
+  // ━━━ Solar Accent ━━━
+  accent: "#F59E0B",
+  accentSoft: "#FFFBEB",
 
-    border: "#E5E7EB",
+  // ━━━ Eco / Production (Green - Solar meaning) ━━━
+  eco: "#16A34A",
+  ecoSoft: "#F0FDF4",
 
-    success: "#16A34A",
-    warning: "#F59E0B",
-    danger: "#DC2626",
-    info: "#2563EB",
+  // ━━━ Base UI ━━━
+  background: "#F8FAFC",
+  surface: "#FFFFFF",
+  surfaceAlt: "#F1F5F9",
 
-    offline: "#94A3B8",
-  },
+  // ━━━ Text ━━━
+  text: "#0F172A",
+  textSecondary: "#334155",
+  subText: "#64748B",
+  textInverse: "#FFFFFF",
+
+  // ━━━ Borders ━━━
+  border: "#E2E8F0",
+  borderLight: "#F1F5F9",
+
+  // ━━━ Status ━━━
+  danger: "#EF4444",
+  dangerSoft: "#FEF2F2",
+  warning: "#F59E0B",
+  warningSoft: "#FFFBEB",
+  info: "#3B82F6",
+  infoSoft: "#EFF6FF",
+
+  // ━━━ Shadows ━━━
+  shadow: "#0B1F3B",
+  shadowSoft: "#64748B",
+},
 
   spacing: {
     xs: 4,

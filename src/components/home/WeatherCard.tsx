@@ -6,6 +6,7 @@ import {
   Text,
   StyleSheet,
   ActivityIndicator,
+  TouchableOpacity,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Theme } from "../../theme/theme";
@@ -23,6 +24,8 @@ export default function WeatherCard() {
 
   const fetchWeather = async () => {
     try {
+      setLoading(true);
+
       const res = await fetch(
         "https://api.open-meteo.com/v1/forecast?latitude=18.5204&longitude=73.8567&current_weather=true"
       );
@@ -84,163 +87,150 @@ export default function WeatherCard() {
     code: number
   ) => {
     if (code <= 3)
-      return "Good day for rooftop work";
+      return "Perfect weather for rooftop maintenance";
     if (code <= 67)
-      return "Use anti-slip shoes";
+      return "Use anti-slip shoes and safety harness";
     if (code <= 99)
-      return "Avoid outdoor maintenance";
+      return "Avoid outdoor panel work if possible";
 
-    return "Check safety gear";
+    return "Inspect tools before starting";
   };
 
   return (
     <View style={styles.wrapper}>
-      <Text style={styles.heading}>
-        Weather Insight
-      </Text>
+      {/* Header */}
+      <View style={styles.topRow}>
+        <View>
+          <Text style={styles.smallHead}>
+            Live Forecast
+          </Text>
 
+          <Text style={styles.heading}>
+            Weather Insight
+          </Text>
+        </View>
+
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={fetchWeather}
+          style={styles.refreshBtn}
+        >
+          <Ionicons
+            name="refresh"
+            size={18}
+            color="#fff"
+          />
+        </TouchableOpacity>
+      </View>
+
+      {/* Card */}
       <View style={styles.card}>
-        {/* BG Circles */}
-        <View
-          style={styles.circle1}
-        />
-        <View
-          style={styles.circle2}
-        />
+        {/* Glow Effects */}
+        <View style={styles.glow1} />
+        <View style={styles.glow2} />
+        <View style={styles.glow3} />
 
         {loading ? (
-          <View
-            style={
-              styles.loaderBox
-            }
-          >
+          <View style={styles.loaderBox}>
             <ActivityIndicator
               size="large"
               color="#fff"
             />
 
             <Text
-              style={
-                styles.loadingText
-              }
+              style={styles.loadingText}
             >
-              Loading weather...
+              Fetching weather...
             </Text>
           </View>
         ) : (
           <>
-            {/* Left */}
-            <View
-              style={{
-                flex: 1,
-              }}
-            >
-              <Text
-                style={
-                  styles.city
-                }
-              >
-                Pune,
-                Maharashtra
+            {/* LEFT SIDE */}
+            <View style={styles.left}>
+              <Text style={styles.city}>
+                Pune, Maharashtra
               </Text>
 
-              <Text
-                style={
-                  styles.temp
-                }
-              >
+              <Text style={styles.temp}>
                 {Math.round(
                   weather?.temperature
                 )}
                 °C
               </Text>
 
-              <Text
-                style={
-                  styles.status
-                }
-              >
+              <Text style={styles.status}>
                 {getWeatherText(
                   weather?.weathercode
                 )}
               </Text>
 
-              <View
-                style={
-                  styles.metaRow
-                }
-              >
+              <View style={styles.metaRow}>
                 <View
-                  style={
-                    styles.metaChip
-                  }
+                  style={styles.metaChip}
                 >
                   <Ionicons
                     name="speedometer-outline"
                     size={14}
                     color="#fff"
                   />
+
                   <Text
-                    style={
-                      styles.metaText
-                    }
+                    style={styles.metaText}
                   >
                     {
                       weather?.windspeed
-                    }{" "}
-                    km/h
+                    } km/h
                   </Text>
                 </View>
 
                 <View
-                  style={
-                    styles.metaChip
-                  }
+                  style={styles.metaChip}
                 >
                   <Ionicons
-                    name="sunny-outline"
+                    name="time-outline"
                     size={14}
                     color="#fff"
                   />
+
                   <Text
-                    style={
-                      styles.metaText
-                    }
+                    style={styles.metaText}
                   >
                     Live
                   </Text>
                 </View>
               </View>
+
+              <View style={styles.tipBox}>
+                <Ionicons
+                  name="shield-checkmark"
+                  size={14}
+                  color="#fff"
+                />
+
+                <Text style={styles.tip}>
+                  {getSafetyTip(
+                    weather?.weathercode
+                  )}
+                </Text>
+              </View>
             </View>
 
-            {/* Right */}
-            <View
-              style={
-                styles.rightSide
-              }
-            >
+            {/* RIGHT SIDE */}
+            <View style={styles.right}>
               <View
-                style={
-                  styles.iconWrap
-                }
+                style={styles.iconWrap}
               >
                 <Ionicons
                   name={getWeatherIcon(
                     weather?.weathercode
                   )}
-                  size={54}
+                  size={58}
                   color="#fff"
                 />
               </View>
 
-              <Text
-                style={
-                  styles.tip
-                }
-              >
-                {getSafetyTip(
-                  weather?.weathercode
-                )}
+              <Text style={styles.updated}>
+                Updated Now
               </Text>
             </View>
           </>
@@ -253,92 +243,144 @@ export default function WeatherCard() {
 const styles =
   StyleSheet.create({
     wrapper: {
-      marginTop: 18,
+      marginTop: 20,
+    },
+
+    topRow: {
+      flexDirection: "row",
+      justifyContent:
+        "space-between",
+      alignItems: "center",
+      marginBottom: 14,
+    },
+
+    smallHead: {
+      fontSize: 13,
+      color:
+        Theme.colors.subText,
+      fontWeight: "700",
     },
 
     heading: {
-      fontSize: 18,
-      fontWeight: "800",
-      color: "#0F172A",
-      marginBottom: 12,
+      fontSize: 20,
+      fontWeight: "900",
+      color:
+        Theme.colors.text,
+      marginTop: 2,
+    },
+
+    refreshBtn: {
+      width: 42,
+      height: 42,
+      borderRadius: 14,
+      backgroundColor:
+        Theme.colors.primary,
+      justifyContent:
+        "center",
+      alignItems:
+        "center",
     },
 
     card: {
       backgroundColor:
         Theme.colors.primary,
-      borderRadius: 26,
+      borderRadius: 28,
       padding: 20,
-      minHeight: 190,
+      minHeight: 210,
       flexDirection: "row",
-      alignItems: "center",
       overflow: "hidden",
 
-      shadowColor: "#000",
-      shadowOpacity: 0.08,
-      shadowRadius: 10,
-      elevation: 5,
+      shadowColor:
+        Theme.colors.shadow,
+      shadowOpacity: 0.1,
+      shadowRadius: 12,
+      shadowOffset: {
+        width: 0,
+        height: 8,
+      },
+
+      elevation: 4,
     },
 
-    circle1: {
+    glow1: {
       position: "absolute",
-      top: -40,
-      right: -30,
-      width: 140,
-      height: 140,
-      borderRadius: 80,
+      top: -45,
+      right: -20,
+      width: 170,
+      height: 170,
+      borderRadius: 100,
       backgroundColor:
-        "rgba(255,255,255,0.08)",
+        "rgba(255,255,255,0.09)",
     },
 
-    circle2: {
+    glow2: {
       position: "absolute",
       bottom: -50,
-      left: -20,
-      width: 120,
-      height: 120,
+      left: -25,
+      width: 130,
+      height: 130,
       borderRadius: 80,
       backgroundColor:
-        "rgba(255,255,255,0.06)",
+        "rgba(255,255,255,0.05)",
+    },
+
+    glow3: {
+      position: "absolute",
+      top: 60,
+      right: 30,
+      width: 80,
+      height: 80,
+      borderRadius: 40,
+      backgroundColor:
+        "rgba(255,255,255,0.04)",
     },
 
     loaderBox: {
       flex: 1,
       justifyContent:
         "center",
-      alignItems: "center",
+      alignItems:
+        "center",
     },
 
     loadingText: {
       color: "#fff",
       marginTop: 12,
-      fontWeight: "600",
+      fontWeight: "700",
+    },
+
+    left: {
+      flex: 1,
+      paddingRight: 8,
     },
 
     city: {
-      color: "#E0E7FF",
+      color:
+        "rgba(255,255,255,0.75)",
       fontSize: 14,
-      fontWeight: "600",
+      fontWeight: "700",
     },
 
     temp: {
-      color: "#fff",
-      fontSize: 42,
+      fontSize: 50,
       fontWeight: "900",
-      marginTop: 8,
+      color: "#fff",
+      marginTop: 6,
+      lineHeight: 56,
     },
 
     status: {
       color: "#fff",
-      fontSize: 15,
-      fontWeight: "700",
-      marginTop: 4,
+      fontSize: 16,
+      fontWeight: "800",
+      marginTop: 2,
     },
 
     metaRow: {
       flexDirection: "row",
-      gap: 10,
-      marginTop: 14,
       flexWrap: "wrap",
+      gap: 8,
+      marginTop: 14,
     },
 
     metaChip: {
@@ -347,40 +389,65 @@ const styles =
       backgroundColor:
         "rgba(255,255,255,0.14)",
       paddingHorizontal: 10,
-      paddingVertical: 7,
+      paddingVertical: 8,
       borderRadius: 14,
     },
 
     metaText: {
       color: "#fff",
-      marginLeft: 6,
       fontSize: 12,
-      fontWeight: "600",
+      fontWeight: "700",
+      marginLeft: 6,
     },
 
-    rightSide: {
-      marginLeft: 14,
+    tipBox: {
+      marginTop: 14,
+      flexDirection: "row",
       alignItems: "center",
-      width: 110,
-    },
-
-    iconWrap: {
-      width: 84,
-      height: 84,
-      borderRadius: 42,
       backgroundColor:
-        "rgba(255,255,255,0.15)",
-      justifyContent:
-        "center",
-      alignItems: "center",
+        "rgba(255,255,255,0.12)",
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      borderRadius: 16,
     },
 
     tip: {
-      marginTop: 10,
-      color: "#DBEAFE",
-      fontSize: 11,
-      textAlign: "center",
+      flex: 1,
+      color: "#fff",
+      fontSize: 12,
       fontWeight: "600",
-      lineHeight: 16,
+      marginLeft: 8,
+      lineHeight: 17,
+    },
+
+    right: {
+      width: 118,
+      alignItems: "center",
+      justifyContent:
+        "center",
+      marginLeft: 8,
+    },
+
+    iconWrap: {
+      width: 92,
+      height: 92,
+      borderRadius: 46,
+      backgroundColor:
+        "rgba(255,255,255,0.14)",
+      justifyContent:
+        "center",
+      alignItems:
+        "center",
+      borderWidth: 1,
+      borderColor:
+        "rgba(255,255,255,0.08)",
+    },
+
+    updated: {
+      marginTop: 12,
+      fontSize: 11,
+      color:
+        "rgba(255,255,255,0.75)",
+      fontWeight: "700",
     },
   });

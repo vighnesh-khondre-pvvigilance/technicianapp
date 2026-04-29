@@ -25,8 +25,10 @@ export default function Login() {
   const { login } = useAuth();
 
   const [id, setId] = useState("");
-  const [password, setPassword] = useState("");
-  const [secure, setSecure] = useState(true);
+  const [password, setPassword] =
+    useState("");
+  const [secure, setSecure] =
+    useState(true);
 
   const handleLogin = async () => {
     await login(mockUser, "dummy-token");
@@ -35,49 +37,121 @@ export default function Login() {
 
   return (
     <Screen>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar
+        translucent={false}
+        backgroundColor={
+          Theme.colors.background
+        }
+        barStyle="dark-content"
+      />
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={
+          Platform.OS === "ios"
+            ? "padding"
+            : undefined
+        }
       >
         <ScrollView
           keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scroll}
+          showsVerticalScrollIndicator={
+            false
+          }
+          contentContainerStyle={
+            styles.scroll
+          }
         >
           <View style={styles.container}>
             {/* Brand */}
             <View style={styles.brandWrap}>
-              <View style={styles.logoBox}>
-                <Ionicons name="flash" size={24} color="#fff" />
+              <View
+                style={styles.logoBox}
+              >
+                <Ionicons
+                  name="flash"
+                  size={24}
+                  color={
+                    Theme.colors
+                      .textInverse
+                  }
+                />
               </View>
 
-              <Text style={styles.brand}>PVprotech</Text>
-              <Text style={styles.caption}>Technician Portal</Text>
+              <Text style={styles.brand}>
+                PVprotech
+              </Text>
+
+              <Text
+                style={styles.caption}
+              >
+                Technician Portal
+              </Text>
             </View>
 
             {/* Login Card */}
             <View style={styles.card}>
-              <Text style={styles.heading}>Sign In</Text>
+              <View
+                style={styles.topBadge}
+              >
+                <Ionicons
+                  name="shield-checkmark"
+                  size={14}
+                  color={
+                    Theme.colors
+                      .eco
+                  }
+                />
 
-              <Text style={styles.subheading}>
-                Access your assigned work, reports and daily tasks.
+                <Text
+                  style={
+                    styles.topBadgeText
+                  }
+                >
+                  Secure Access
+                </Text>
+              </View>
+
+              <Text style={styles.heading}>
+                Sign In
+              </Text>
+
+              <Text
+                style={
+                  styles.subheading
+                }
+              >
+                Access your assigned
+                work, reports and
+                daily technician
+                tasks.
               </Text>
 
               {/* Technician ID */}
-              <Text style={styles.label}>Technician ID</Text>
+              <Text style={styles.label}>
+                Technician ID
+              </Text>
 
-              <View style={styles.inputWrap}>
+              <View
+                style={
+                  styles.inputWrap
+                }
+              >
                 <Ionicons
                   name="person-outline"
                   size={18}
-                  color="#94A3B8"
+                  color={
+                    Theme.colors
+                      .subText
+                  }
                 />
 
                 <TextInput
                   placeholder="Enter technician ID"
-                  placeholderTextColor="#94A3B8"
+                  placeholderTextColor={
+                    Theme.colors
+                      .subText
+                  }
                   value={id}
                   onChangeText={setId}
                   style={styles.input}
@@ -86,26 +160,46 @@ export default function Login() {
               </View>
 
               {/* Password */}
-              <Text style={styles.label}>Password</Text>
+              <Text style={styles.label}>
+                Password
+              </Text>
 
-              <View style={styles.inputWrap}>
+              <View
+                style={
+                  styles.inputWrap
+                }
+              >
                 <Ionicons
                   name="lock-closed-outline"
                   size={18}
-                  color="#94A3B8"
+                  color={
+                    Theme.colors
+                      .subText
+                  }
                 />
 
                 <TextInput
                   placeholder="Enter password"
-                  placeholderTextColor="#94A3B8"
+                  placeholderTextColor={
+                    Theme.colors
+                      .subText
+                  }
                   value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry={secure}
+                  onChangeText={
+                    setPassword
+                  }
+                  secureTextEntry={
+                    secure
+                  }
                   style={styles.input}
                 />
 
                 <TouchableOpacity
-                  onPress={() => setSecure(!secure)}
+                  onPress={() =>
+                    setSecure(
+                      !secure
+                    )
+                  }
                 >
                   <Ionicons
                     name={
@@ -114,41 +208,63 @@ export default function Login() {
                         : "eye-outline"
                     }
                     size={18}
-                    color="#94A3B8"
+                    color={
+                      Theme.colors
+                        .subText
+                    }
                   />
                 </TouchableOpacity>
               </View>
 
               {/* Forgot */}
               <TouchableOpacity
-                style={styles.forgotWrap}
+                style={
+                  styles.forgotWrap
+                }
               >
-                <Text style={styles.forgot}>
+                <Text
+                  style={
+                    styles.forgot
+                  }
+                >
                   Forgot password?
                 </Text>
               </TouchableOpacity>
 
-              {/* Login */}
+              {/* Button */}
               <TouchableOpacity
                 style={styles.button}
                 activeOpacity={0.9}
-                onPress={handleLogin}
+                onPress={
+                  handleLogin
+                }
               >
-                <Text style={styles.buttonText}>
+                <Text
+                  style={
+                    styles.buttonText
+                  }
+                >
                   Login
                 </Text>
 
                 <Ionicons
                   name="arrow-forward"
                   size={18}
-                  color="#fff"
+                  color={
+                    Theme.colors
+                      .textInverse
+                  }
                 />
               </TouchableOpacity>
             </View>
 
             {/* Footer */}
-            <Text style={styles.bottomText}>
-              Secure internal access only
+            <Text
+              style={styles.bottomText}
+            >
+              Internal access for
+              approved technicians
+              only
             </Text>
           </View>
         </ScrollView>
@@ -164,44 +280,32 @@ const styles = StyleSheet.create({
   },
 
   container: {
-    padding: 18,
+    padding: Theme.spacing.md + 2,
+    backgroundColor:
+      Theme.colors.background,
   },
 
   brandWrap: {
-    marginBottom: 26,
+    marginBottom:
+      Theme.spacing.lg,
   },
 
   logoBox: {
-    width: 54,
-    height: 54,
-    borderRadius: 18,
-    backgroundColor: Theme.colors.primary,
-    justifyContent: "center",
+    width: 58,
+    height: 58,
+    borderRadius:
+      Theme.radius.lg,
+    backgroundColor:
+      Theme.colors.primary,
+    justifyContent:
+      "center",
     alignItems: "center",
     marginBottom: 14,
-  },
 
-  brand: {
-    fontSize: 28,
-    fontWeight: "800",
-    color: "#0F172A",
-    letterSpacing: -0.5,
-  },
-
-  caption: {
-    marginTop: 4,
-    fontSize: 14,
-    color: "#64748B",
-    fontWeight: "500",
-  },
-
-  card: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 28,
-    padding: 22,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 18,
+    shadowColor:
+      Theme.colors.shadow,
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
     shadowOffset: {
       width: 0,
       height: 8,
@@ -209,33 +313,95 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
 
-  heading: {
-    fontSize: 24,
+  brand: {
+    fontSize: 30,
+    fontWeight: "900",
+    color: Theme.colors.text,
+    letterSpacing: -0.6,
+  },
+
+  caption: {
+    marginTop: 4,
+    fontSize: 14,
+    fontWeight: "600",
+    color:
+      Theme.colors.subText,
+  },
+
+  card: {
+    backgroundColor:
+      Theme.colors.surface,
+    borderRadius:
+      Theme.radius.xl,
+    padding: 22,
+    borderWidth: 1,
+    borderColor:
+      Theme.colors.border,
+
+    shadowColor:
+      Theme.colors.shadow,
+    shadowOpacity: 0.07,
+    shadowRadius: 18,
+    shadowOffset: {
+      width: 0,
+      height: 10,
+    },
+
+    elevation: 4,
+  },
+
+  topBadge: {
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor:
+      Theme.colors.ecoSoft,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 999,
+    marginBottom: 16,
+  },
+
+  topBadgeText: {
+    fontSize: 12,
     fontWeight: "800",
-    color: "#0F172A",
+    color:
+      Theme.colors.eco,
+  },
+
+  heading: {
+    fontSize: 26,
+    fontWeight: "900",
+    color: Theme.colors.text,
   },
 
   subheading: {
-    marginTop: 6,
+    marginTop: 8,
     marginBottom: 22,
     fontSize: 14,
-    lineHeight: 21,
-    color: "#64748B",
+    lineHeight: 22,
+    color:
+      Theme.colors.subText,
   },
 
   label: {
     fontSize: 13,
-    fontWeight: "700",
-    color: "#334155",
+    fontWeight: "800",
+    color:
+      Theme.colors.textSecondary,
     marginBottom: 8,
   },
 
   inputWrap: {
     height: 56,
-    borderRadius: 16,
+    borderRadius:
+      Theme.radius.lg,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
-    backgroundColor: "#F8FAFC",
+    borderColor:
+      Theme.colors.border,
+    backgroundColor:
+      Theme.colors.surfaceAlt,
     paddingHorizontal: 14,
     flexDirection: "row",
     alignItems: "center",
@@ -246,42 +412,49 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 10,
     fontSize: 14,
-    color: "#0F172A",
+    color: Theme.colors.text,
   },
 
   forgotWrap: {
     alignSelf: "flex-end",
+    marginTop: -2,
     marginBottom: 18,
-    marginTop: -4,
   },
 
   forgot: {
     fontSize: 13,
-    fontWeight: "600",
-    color: Theme.colors.primary,
+    fontWeight: "700",
+    color:
+      Theme.colors.primary,
   },
 
   button: {
     height: 56,
-    borderRadius: 16,
-    backgroundColor: Theme.colors.primary,
+    borderRadius:
+      Theme.radius.lg,
+    backgroundColor:
+      Theme.colors.primary,
     flexDirection: "row",
-    justifyContent: "center",
+    justifyContent:
+      "center",
     alignItems: "center",
     gap: 8,
   },
 
   buttonText: {
-    color: "#fff",
+    color:
+      Theme.colors.textInverse,
     fontSize: 15,
-    fontWeight: "700",
+    fontWeight: "900",
   },
 
   bottomText: {
     textAlign: "center",
-    marginTop: 22,
+    marginTop:
+      Theme.spacing.lg,
     fontSize: 12,
-    color: "#94A3B8",
-    fontWeight: "500",
+    fontWeight: "600",
+    color:
+      Theme.colors.subText,
   },
 });

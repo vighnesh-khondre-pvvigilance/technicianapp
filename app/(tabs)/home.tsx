@@ -1,13 +1,33 @@
-import React, { useMemo, useRef, useState } from "react";
+// app/(tabs)/home.tsx
+
+import React, {
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+
 import {
   View,
   Text,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
+  StatusBar,
 } from "react-native";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+
+import {
+  Ionicons,
+} from "@expo/vector-icons";
+
 import BottomSheet from "@gorhom/bottom-sheet";
+
+import Animated, {
+  FadeInDown,
+  FadeInUp,
+  FadeInRight,
+  ZoomIn,
+  LinearTransition,
+} from "react-native-reanimated";
 
 import Screen from "../../src/components/Screen";
 import HeaderCard from "../../src/components/home/HeaderCard";
@@ -25,12 +45,18 @@ import YieldCalc from "../../src/components/toolbox/YieldCalc";
 import { Theme } from "../../src/theme/theme";
 
 export default function HomeScreen() {
-  const [tool, setTool] = useState<string | null>(null);
-  const sheetRef = useRef<BottomSheet>(null);
+  const [tool, setTool] =
+    useState<string | null>(null);
 
-  const snapPoints = useMemo(() => ["68%"], []);
+  const sheetRef =
+    useRef<BottomSheet>(null);
 
-  const openTool = (name: string) => {
+  const snapPoints =
+    useMemo(() => ["74%"], []);
+
+  const openTool = (
+    name: string
+  ) => {
     setTool(name);
     sheetRef.current?.expand();
   };
@@ -39,14 +65,19 @@ export default function HomeScreen() {
     switch (tool) {
       case "Inverter":
         return <InverterCalc />;
+
       case "Cleaning":
         return <CleaningCalc />;
+
       case "VOC":
         return <VocCalc />;
+
       case "Voltage":
         return <VoltageDrop />;
+
       case "Yield":
         return <YieldCalc />;
+
       default:
         return (
           <Text style={styles.emptyText}>
@@ -56,197 +87,327 @@ export default function HomeScreen() {
     }
   };
 
-  const todaySchedule = [
-    {
-      id: "1",
-      time: "10:30 AM",
-      title: "Inspection - Hinjewadi",
-      icon: "clipboard-check-outline",
-    },
-    {
-      id: "2",
-      time: "1:00 PM",
-      title: "Cleaning - Baner",
-      icon: "spray-bottle",
-    },
-    {
-      id: "3",
-      time: "4:00 PM",
-      title: "Maintenance - Wakad",
-      icon: "tools",
-    },
-  ];
-
   return (
     <Screen>
-      <View style={styles.container}>
+      <StatusBar
+        translucent={false}
+        backgroundColor={
+          Theme.colors.background
+        }
+        barStyle="dark-content"
+      />
+
+      <View style={styles.page}>
         <ScrollView
-          contentContainerStyle={styles.content}
-          showsVerticalScrollIndicator={false}
+          showsVerticalScrollIndicator={
+            false
+          }
+          contentContainerStyle={
+            styles.scroll
+          }
         >
-          {/* Header */}
-          <HeaderCard />
+          {/* HERO */}
+          <Animated.View
+            entering={FadeInDown.springify().delay(
+              80
+            )}
+            layout={LinearTransition.springify()}
+            style={styles.heroWrap}
+          >
+            <View style={styles.heroGlow1} />
+            <View style={styles.heroGlow2} />
 
-          {/* Stats */}
-          <StatsRow />
+            <HeaderCard />
+          </Animated.View>
 
-          {/* Quick Tools */}
-          
-          <QuickSolveGrid onPress={openTool} />
+          {/* STATS */}
+          <Animated.View
+            entering={FadeInUp.springify().delay(
+              150
+            )}
+            layout={LinearTransition.springify()}
+            style={styles.section}
+          >
+            <StatsRow />
+          </Animated.View>
 
-          {/* Today's Work */}
-          {/* <View style={styles.rowBetween}>
-            <Text style={styles.sectionTitle}>Today's Schedule</Text>
+          {/* QUICK TOOLS */}
+          <Animated.View
+            entering={FadeInDown.springify().delay(
+              230
+            )}
+            layout={LinearTransition.springify()}
+            style={styles.section}
+          >
+            <View style={styles.block}>
+              
 
-            <TouchableOpacity>
-              <Text style={styles.linkText}>View All</Text>
-            </TouchableOpacity>
-          </View> */}
-
-          {/* {todaySchedule.map((item) => (
-            <TouchableOpacity key={item.id} style={styles.scheduleCard}>
-              <View style={styles.leftRow}>
-                <View style={styles.iconBox}>
-                  <MaterialCommunityIcons
-                    name={item.icon as any}
-                    size={22}
-                    color={Theme.colors.primary}
-                  />
-                </View>
-
-                <View>
-                  <Text style={styles.scheduleTitle}>{item.title}</Text>
-                  <Text style={styles.timeText}>{item.time}</Text>
-                </View>
-              </View>
-
-              <Ionicons
-                name="chevron-forward"
-                size={18}
-                color={Theme.colors.subtext}
+              <QuickSolveGrid
+                onPress={openTool}
               />
-            </TouchableOpacity>
-          ))} */}
+            </View>
+          </Animated.View>
 
-          {/* Weather */}
+          {/* WEATHER */}
+          <Animated.View
+            entering={FadeInRight.springify().delay(
+              300
+            )}
+            layout={LinearTransition.springify()}
+            style={styles.section}
+          >
+            <WeatherCard />
+          </Animated.View>
+
+          {/* RECENT WORK */}
+          <Animated.View
+            entering={FadeInDown.springify().delay(
+              380
+            )}
+            layout={LinearTransition.springify()}
+            style={styles.section}
+          >
+            <View style={styles.block}>
+              
+                
+
+                
+
+              <RecentWorkList />
+            </View>
+          </Animated.View>
+
+          {/* CTA */}
           
-          <WeatherCard />
 
-          {/* Recent Work */}
-          
-          <RecentWorkList />
-
-          <View style={{ height: 120 }} />
+          <View
+            style={{
+              height: 120,
+            }}
+          />
         </ScrollView>
 
-        {/* Bottom Sheet */}
+        {/* TOOL SHEET */}
         <BottomSheet
           ref={sheetRef}
           index={-1}
           snapPoints={snapPoints}
           enablePanDownToClose
-          backgroundStyle={styles.sheetBg}
-          handleIndicatorStyle={styles.sheetHandle}
+          backgroundStyle={
+            styles.sheetBg
+          }
+          handleIndicatorStyle={
+            styles.sheetHandle
+          }
         >
-          <View style={styles.sheet}>{renderTool()}</View>
+          <View style={styles.sheet}>
+            {renderTool()}
+          </View>
         </BottomSheet>
       </View>
     </Screen>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Theme.colors.background,
-  },
+const styles =
+  StyleSheet.create({
+    page: {
+      flex: 1,
+      backgroundColor:
+        Theme.colors.background,
+    },
 
-  content: {
-   padding:5,
-    paddingTop: Theme.spacing.sm,
-    paddingBottom: Theme.spacing.xl,
-  },
+    scroll: {
+      paddingTop: 6,
+      paddingBottom:0,
+    },
 
-  rowBetween: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
+    section: {
+      marginTop: 18,
+      paddingHorizontal: 6,
+    },
 
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: Theme.colors.secondary,
-    marginTop: Theme.spacing.lg,
-    marginBottom: Theme.spacing.sm,
-  },
+    heroWrap: {
+      marginHorizontal: 6,
+      borderRadius: 30,
+      overflow: "hidden",
+      backgroundColor:
+        Theme.colors.primary,
+      shadowColor:
+        Theme.colors.primary,
+      shadowOpacity: 0.18,
+      shadowRadius: 18,
+      shadowOffset: {
+        width: 0,
+        height: 10,
+      },
+      elevation: 8,
+    },
 
-  linkText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: Theme.colors.primary,
-  },
+    heroGlow1: {
+      position: "absolute",
+      top: -45,
+      right: -10,
+      width: 170,
+      height: 170,
+      borderRadius: 100,
+      backgroundColor:
+        "rgba(255,255,255,0.08)",
+    },
 
-  scheduleCard: {
-    backgroundColor: Theme.colors.card,
-    borderRadius: Theme.radius.lg,
-    padding: Theme.spacing.md,
-    marginBottom: Theme.spacing.sm,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: Theme.colors.border,
-  },
+    heroGlow2: {
+      position: "absolute",
+      bottom: -55,
+      left: -25,
+      width: 140,
+      height: 140,
+      borderRadius: 80,
+      backgroundColor:
+        "rgba(255,255,255,0.05)",
+    },
 
-  leftRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-  },
+    block: {
+      backgroundColor:
+        Theme.colors.surface,
+      borderRadius: 26,
+      padding: 16,
+      borderWidth: 1,
+      borderColor:
+        Theme.colors.border,
+      shadowColor: "#000",
+      shadowOpacity: 0.04,
+      shadowRadius: 10,
+      shadowOffset: {
+        width: 0,
+        height: 4,
+      },
+      elevation: 2,
+    },
 
-  iconBox: {
-    width: 46,
-    height: 46,
-    borderRadius: Theme.radius.md,
-    backgroundColor: "#FEF3C7",
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: Theme.spacing.md,
-  },
+    blockHead: {
+      marginBottom: 14,
+    },
 
-  scheduleTitle: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: Theme.colors.text,
-  },
+    blockTitle: {
+      fontSize: 18,
+      fontWeight: "800",
+      color:
+        Theme.colors.text,
+    },
 
-  timeText: {
-    marginTop: 4,
-    fontSize: 13,
-    color: Theme.colors.subtext,
-  },
+    blockSub: {
+      marginTop: 4,
+      fontSize: 13,
+      color:
+        Theme.colors.subText,
+    },
 
-  sheetBg: {
-    backgroundColor: Theme.colors.card,
-    borderTopLeftRadius: Theme.radius.xl,
-    borderTopRightRadius: Theme.radius.xl,
-  },
+    cta: {
+      marginTop: 26,
+      marginHorizontal: 6,
+      backgroundColor:
+        Theme.colors.primary,
+      borderRadius: 30,
+      padding: 22,
+      alignItems: "center",
+      overflow: "hidden",
+      shadowColor:
+        Theme.colors.primary,
+      shadowOpacity: 0.18,
+      shadowRadius: 18,
+      shadowOffset: {
+        width: 0,
+        height: 10,
+      },
+      elevation: 8,
+    },
 
-  sheetHandle: {
-    backgroundColor: Theme.colors.border,
-    width: 55,
-  },
+    ctaGlow: {
+      position: "absolute",
+      top: -50,
+      right: -35,
+      width: 170,
+      height: 170,
+      borderRadius: 90,
+      backgroundColor:
+        Theme.colors.primaryMid,
+      opacity: 0.65,
+    },
 
-  sheet: {
-    flex: 1,
-    padding: Theme.spacing.md,
-  },
+    ctaIcon: {
+      width: 58,
+      height: 58,
+      borderRadius: 29,
+      justifyContent:
+        "center",
+      alignItems: "center",
+      backgroundColor:
+        Theme.colors.accent,
+      marginBottom: 14,
+    },
 
-  emptyText: {
-    color: Theme.colors.subtext,
-    fontSize: 15,
-    textAlign: "center",
-    marginTop: 30,
-  },
-});
+    ctaTitle: {
+      fontSize: 22,
+      fontWeight: "800",
+      color:
+        Theme.colors.textInverse,
+      textAlign: "center",
+    },
+
+    ctaSub: {
+      marginTop: 8,
+      fontSize: 14,
+      lineHeight: 22,
+      textAlign: "center",
+      color:
+        "rgba(255,255,255,0.76)",
+      marginBottom: 18,
+    },
+
+    ctaBtn: {
+      minWidth: 180,
+      height: 54,
+      borderRadius: 18,
+      paddingHorizontal: 20,
+      backgroundColor:
+        Theme.colors.accent,
+      flexDirection: "row",
+      justifyContent:
+        "center",
+      alignItems: "center",
+      gap: 8,
+    },
+
+    ctaBtnText: {
+      color:
+        Theme.colors.primary,
+      fontSize: 15,
+      fontWeight: "800",
+    },
+
+    sheetBg: {
+      backgroundColor:
+        Theme.colors.surface,
+      borderTopLeftRadius: 30,
+      borderTopRightRadius: 30,
+    },
+
+    sheetHandle: {
+      width: 54,
+      backgroundColor:
+        Theme.colors.border,
+    },
+
+    sheet: {
+      flex: 1,
+      padding: 16,
+    },
+
+    emptyText: {
+      textAlign: "center",
+      marginTop: 30,
+      color:
+        Theme.colors.subText,
+      fontSize: 15,
+    },
+  });

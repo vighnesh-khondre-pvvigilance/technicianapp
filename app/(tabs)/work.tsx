@@ -1,5 +1,9 @@
 // app/(tabs)/work.tsx
 
+import React, {
+  useMemo,
+  useState,
+} from "react";
 import {
   View,
   Text,
@@ -7,15 +11,16 @@ import {
   FlatList,
   TouchableOpacity,
   TextInput,
+  StatusBar,
 } from "react-native";
-import {
-  useMemo,
-  useState,
-} from "react";
 import {
   Ionicons,
 } from "@expo/vector-icons";
 import { router } from "expo-router";
+import Animated, {
+  FadeInDown,
+  FadeInRight,
+} from "react-native-reanimated";
 
 import Screen from "../../src/components/Screen";
 import { Theme } from "../../src/theme/theme";
@@ -64,9 +69,7 @@ export default function Work() {
               item.clientId,
             clientName:
               item.clientName,
-            plants: [
-              item,
-            ],
+            plants: [item],
           });
         }
 
@@ -102,376 +105,435 @@ export default function Work() {
 
   return (
     <Screen>
-       <View style={styles.container}>
-      {/* Header */}
+      <StatusBar
+        barStyle="dark-content"
+        backgroundColor={
+          Theme.colors
+            .background
+        }
+      />
+
       <View
         style={
-          styles.headerRow
+          styles.container
         }
       >
-        <View>
-          <Text
-            style={
-              styles.smallTitle
-            }
-          >
-            Solar Dashboard
-          </Text>
-
-          <Text
-            style={
-              styles.mainTitle
-            }
-          >
-            Work Panel
-          </Text>
-        </View>
-
-        <TouchableOpacity
+        {/* HEADER */}
+        <Animated.View
+          entering={FadeInDown.delay(
+            100
+          )}
           style={
-            styles.profileBtn
-          }
-          onPress={() =>
-            router.push(
-              "/(tabs)/profile"
-            )
-          }
-        >
-          <Ionicons
-            name="person-outline"
-            size={20}
-            color="#fff"
-          />
-        </TouchableOpacity>
-      </View>
-
-      {/* Ultra Premium Stats */}
-      <View
-        style={
-          styles.statsCard
-        }
-      >
-        <View
-          style={
-            styles.glow1
-          }
-        />
-        <View
-          style={
-            styles.glow2
-          }
-        />
-
-        <View
-          style={
-            styles.statRow
+            styles.headerRow
           }
         >
           <View>
             <Text
               style={
-                styles.statLabel
+                styles.smallTitle
               }
             >
-              Assigned Clients
+              Technician Dashboard
             </Text>
 
             <Text
               style={
-                styles.statSub
+                styles.mainTitle
               }
             >
-              Total active accounts
+              Work Panel
             </Text>
           </View>
 
-          <Text
+          <TouchableOpacity
             style={
-              styles.statValue
+              styles.profileBtn
             }
-          >
-            {
-              groupedClients.length
-            }
-          </Text>
-        </View>
-
-        <View
-          style={
-            styles.line
-          }
-        />
-
-        <View
-          style={
-            styles.statRow
-          }
-        >
-          <View>
-            <Text
-              style={
-                styles.statLabel
-              }
-            >
-              Pending Plants
-            </Text>
-
-            <Text
-              style={
-                styles.statSub
-              }
-            >
-              Visits remaining
-            </Text>
-          </View>
-
-          <Text
-            style={
-              styles.statValue
-            }
-          >
-            {
-              totalPlants
-            }
-          </Text>
-        </View>
-
-        <View
-          style={
-            styles.line
-          }
-        />
-
-        <View
-          style={
-            styles.statRow
-          }
-        >
-          <View>
-            <Text
-              style={
-                styles.statLabel
-              }
-            >
-              Urgent Visits
-            </Text>
-
-            <Text
-              style={
-                styles.statSub
-              }
-            >
-              High priority tasks
-            </Text>
-          </View>
-
-          <Text
-            style={[
-              styles.statValue,
-              {
-                color:
-                  "#FCA5A5",
-              },
-            ]}
-          >
-            {
-              urgentCount
-            }
-          </Text>
-        </View>
-      </View>
-
-      {/* Search */}
-      <View
-        style={
-          styles.searchBox
-        }
-      >
-        <Ionicons
-          name="search"
-          size={18}
-          color="#64748B"
-        />
-
-        <TextInput
-          placeholder="Search client..."
-          placeholderTextColor="#94A3B8"
-          style={
-            styles.input
-          }
-          value={search}
-          onChangeText={
-            setSearch
-          }
-        />
-      </View>
-
-      {/* Section */}
-      <Text
-        style={
-          styles.sectionTitle
-        }
-      >
-        Assigned Clients
-      </Text>
-
-      {/* List */}
-      <FlatList
-       style={{ flex: 1 }}
-        data={filteredData}
-        keyExtractor={(
-          item,
-          index
-        ) =>
-          `${item.clientId}-${index}`
-        }
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingBottom: 30,
-        }}
-        ListEmptyComponent={
-          <View
-            style={
-              styles.emptyWrap
+            onPress={() =>
+              router.push(
+                "/(tabs)/profile"
+              )
             }
           >
             <Ionicons
-              name="briefcase-outline"
-              size={48}
-              color="#94A3B8"
+              name="person"
+              size={20}
+              color={
+                Theme.colors
+                  .textInverse
+              }
             />
+          </TouchableOpacity>
+        </Animated.View>
 
-            <Text
-              style={
-                styles.emptyTitle
-              }
-            >
-              No Work Found
-            </Text>
+        {/* HERO STATS */}
+        <Animated.View
+          entering={FadeInDown.delay(
+            180
+          )}
+          style={
+            styles.statsCard
+          }
+        >
+          <View
+            style={
+              styles.glow1
+            }
+          />
+          <View
+            style={
+              styles.glow2
+            }
+          />
 
-            <Text
-              style={
-                styles.emptyText
-              }
-            >
-              No assigned clients right now
-            </Text>
-          </View>
-        }
-        renderItem={({
-          item,
-        }) => {
-          const urgent =
-            item.plants.filter(
-              (
-                p: any
-              ) =>
-                p.priority ===
-                "High"
-            ).length;
-
-          return (
-            <TouchableOpacity
-              activeOpacity={
-                0.85
-              }
-              style={
-                styles.card
-              }
-              onPress={() =>
-                router.push(
-                  `/client/${item.clientId}`
-                )
-              }
-            >
-              {/* Avatar */}
-              <View
+          <View
+            style={
+              styles.statRow
+            }
+          >
+            <View>
+              <Text
                 style={
-                  styles.avatar
+                  styles.statLabel
                 }
               >
-                <Text
-                  style={
-                    styles.avatarText
-                  }
-                >
-                  {item.clientName
-                    .charAt(
-                      0
-                    )
-                    .toUpperCase()}
-                </Text>
-              </View>
+                Assigned Clients
+              </Text>
 
-              {/* Info */}
-              <View
-                style={{
-                  flex: 1,
-                }}
+              <Text
+                style={
+                  styles.statSub
+                }
               >
-                <Text
+                Active accounts
+              </Text>
+            </View>
+
+            <Text
+              style={
+                styles.statValue
+              }
+            >
+              {
+                groupedClients.length
+              }
+            </Text>
+          </View>
+
+          <View
+            style={
+              styles.line
+            }
+          />
+
+          <View
+            style={
+              styles.statRow
+            }
+          >
+            <View>
+              <Text
+                style={
+                  styles.statLabel
+                }
+              >
+                Pending Plants
+              </Text>
+
+              <Text
+                style={
+                  styles.statSub
+                }
+              >
+                Visits left
+              </Text>
+            </View>
+
+            <Text
+              style={
+                styles.statValue
+              }
+            >
+              {
+                totalPlants
+              }
+            </Text>
+          </View>
+
+          <View
+            style={
+              styles.line
+            }
+          />
+
+          <View
+            style={
+              styles.statRow
+            }
+          >
+            <View>
+              <Text
+                style={
+                  styles.statLabel
+                }
+              >
+                Urgent Visits
+              </Text>
+
+              <Text
+                style={
+                  styles.statSub
+                }
+              >
+                High priority
+              </Text>
+            </View>
+
+            <Text
+              style={[
+                styles.statValue,
+                {
+                  color:
+                    Theme
+                      .colors
+                      .accent,
+                },
+              ]}
+            >
+              {
+                urgentCount
+              }
+            </Text>
+          </View>
+        </Animated.View>
+
+        {/* SEARCH */}
+        <Animated.View
+          entering={FadeInDown.delay(
+            240
+          )}
+          style={
+            styles.searchBox
+          }
+        >
+          <Ionicons
+            name="search"
+            size={18}
+            color={
+              Theme.colors
+                .subText
+            }
+          />
+
+          <TextInput
+            placeholder="Search client..."
+            placeholderTextColor={
+              Theme.colors
+                .subText
+            }
+            style={
+              styles.input
+            }
+            value={search}
+            onChangeText={
+              setSearch
+            }
+          />
+        </Animated.View>
+
+        {/* SECTION */}
+        <Animated.Text
+          entering={FadeInDown.delay(
+            280
+          )}
+          style={
+            styles.sectionTitle
+          }
+        >
+          Assigned Clients
+        </Animated.Text>
+
+        {/* LIST */}
+        <FlatList
+          data={
+            filteredData
+          }
+          keyExtractor={(
+            item,
+            index
+          ) =>
+            `${item.clientId}-${index}`
+          }
+          showsVerticalScrollIndicator={
+            false
+          }
+          contentContainerStyle={{
+            paddingBottom: 30,
+          }}
+          ListEmptyComponent={
+            <Animated.View
+              entering={FadeInDown}
+              style={
+                styles.emptyWrap
+              }
+            >
+              <Ionicons
+                name="briefcase-outline"
+                size={52}
+                color={
+                  Theme.colors
+                    .subText
+                }
+              />
+
+              <Text
+                style={
+                  styles.emptyTitle
+                }
+              >
+                No Work Found
+              </Text>
+
+              <Text
+                style={
+                  styles.emptyText
+                }
+              >
+                No assigned
+                clients right
+                now
+              </Text>
+            </Animated.View>
+          }
+          renderItem={({
+            item,
+            index,
+          }) => {
+            const urgent =
+              item.plants.filter(
+                (
+                  p: any
+                ) =>
+                  p.priority ===
+                  "High"
+              ).length;
+
+            return (
+              <Animated.View
+                entering={FadeInRight.delay(
+                  index *
+                    80
+                )}
+              >
+                <TouchableOpacity
+                  activeOpacity={
+                    0.9
+                  }
                   style={
-                    styles.name
+                    styles.card
+                  }
+                  onPress={() =>
+                    router.push(
+                      `/client/${item.clientId}`
+                    )
                   }
                 >
-                  {
-                    item.clientName
-                  }
-                </Text>
-
-                <Text
-                  style={
-                    styles.sub
-                  }
-                >
-                  {
-                    item.plants
-                      .length
-                  }{" "}
-                  Plants Assigned
-                </Text>
-
-                {urgent >
-                  0 && (
+                  {/* Avatar */}
                   <View
                     style={
-                      styles.badge
+                      styles.avatar
                     }
                   >
-                    <Ionicons
-                      name="warning"
-                      size={
-                        12
-                      }
-                      color="#DC2626"
-                    />
                     <Text
                       style={
-                        styles.badgeText
+                        styles.avatarText
+                      }
+                    >
+                      {item.clientName
+                        .charAt(
+                          0
+                        )
+                        .toUpperCase()}
+                    </Text>
+                  </View>
+
+                  {/* INFO */}
+                  <View
+                    style={{
+                      flex: 1,
+                    }}
+                  >
+                    <Text
+                      style={
+                        styles.name
                       }
                     >
                       {
-                        urgent
-                      }{" "}
-                      urgent
+                        item.clientName
+                      }
                     </Text>
-                  </View>
-                )}
-              </View>
 
-              <Ionicons
-                name="chevron-forward"
-                size={22}
-                color={
-                  Theme
-                    .colors
-                    .primary
-                }
-              />
-            </TouchableOpacity>
-          );
-        }}
-      />
+                    <Text
+                      style={
+                        styles.sub
+                      }
+                    >
+                      {
+                        item
+                          .plants
+                          .length
+                      }{" "}
+                      Plants
+                      Assigned
+                    </Text>
+
+                    {urgent >
+                      0 && (
+                      <View
+                        style={
+                          styles.badge
+                        }
+                      >
+                        <Ionicons
+                          name="warning"
+                          size={
+                            12
+                          }
+                          color={
+                            Theme
+                              .colors
+                              .danger
+                          }
+                        />
+
+                        <Text
+                          style={
+                            styles.badgeText
+                          }
+                        >
+                          {
+                            urgent
+                          }{" "}
+                          urgent
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+
+                  <Ionicons
+                    name="chevron-forward"
+                    size={20}
+                    color={
+                      Theme
+                        .colors
+                        .primary
+                    }
+                  />
+                </TouchableOpacity>
+              </Animated.View>
+            );
+          }}
+        />
       </View>
     </Screen>
   );
@@ -481,10 +543,10 @@ const styles =
   StyleSheet.create({
     container: {
       flex: 1,
-  paddingHorizontal: 6,
-  paddingTop: 4,
-  paddingBottom: 10,
-},
+      paddingHorizontal: 6,
+      paddingTop: 8,
+    },
+
     headerRow: {
       flexDirection:
         "row",
@@ -498,7 +560,8 @@ const styles =
     smallTitle: {
       fontSize: 13,
       color:
-        Theme.colors.subtext,
+        Theme.colors
+          .subText,
       fontWeight: "600",
     },
 
@@ -506,16 +569,17 @@ const styles =
       fontSize: 28,
       fontWeight: "800",
       color:
-        Theme.colors.text,
-      marginTop: 2,
+        Theme.colors
+          .text,
     },
 
     profileBtn: {
-      width: 46,
-      height: 46,
-      borderRadius: 16,
+      width: 48,
+      height: 48,
+      borderRadius: 18,
       backgroundColor:
-        Theme.colors.primary,
+        Theme.colors
+          .primary,
       justifyContent:
         "center",
       alignItems:
@@ -524,7 +588,8 @@ const styles =
 
     statsCard: {
       backgroundColor:
-        Theme.colors.primary,
+        Theme.colors
+          .primary,
       borderRadius: 28,
       padding: 18,
       marginBottom: 18,
@@ -535,11 +600,11 @@ const styles =
     glow1: {
       position:
         "absolute",
-      top: -40,
-      right: -30,
-      width: 120,
-      height: 120,
-      borderRadius: 60,
+      top: -35,
+      right: -20,
+      width: 140,
+      height: 140,
+      borderRadius: 80,
       backgroundColor:
         "rgba(255,255,255,0.08)",
     },
@@ -549,11 +614,11 @@ const styles =
         "absolute",
       bottom: -30,
       left: -30,
-      width: 100,
-      height: 100,
-      borderRadius: 50,
+      width: 110,
+      height: 110,
+      borderRadius: 70,
       backgroundColor:
-        "rgba(255,255,255,0.06)",
+        "rgba(255,255,255,0.05)",
     },
 
     statRow: {
@@ -574,7 +639,7 @@ const styles =
 
     statSub: {
       color:
-        "rgba(255,255,255,0.7)",
+        "rgba(255,255,255,0.72)",
       fontSize: 12,
       marginTop: 2,
     },
@@ -593,35 +658,44 @@ const styles =
     },
 
     searchBox: {
-      backgroundColor:
-        "#fff",
-      borderRadius: 18,
-      paddingHorizontal: 14,
-      paddingVertical: 13,
       flexDirection:
         "row",
       alignItems:
         "center",
+      backgroundColor:
+        Theme.colors
+          .surface,
+      borderRadius: 18,
+      paddingHorizontal: 14,
+      height: 54,
+      borderWidth: 1,
+      borderColor:
+        Theme.colors
+          .border,
       marginBottom: 18,
     },
 
     input: {
-      marginLeft: 10,
       flex: 1,
-      color: "#111827",
+      marginLeft: 10,
+      color:
+        Theme.colors
+          .text,
     },
 
     sectionTitle: {
       fontSize: 18,
       fontWeight: "800",
-      marginBottom: 12,
       color:
-        Theme.colors.text,
+        Theme.colors
+          .text,
+      marginBottom: 12,
     },
 
     card: {
       backgroundColor:
-        "#fff",
+        Theme.colors
+          .surface,
       borderRadius: 22,
       padding: 16,
       marginBottom: 12,
@@ -629,18 +703,19 @@ const styles =
         "row",
       alignItems:
         "center",
-      shadowColor: "#000",
-      shadowOpacity: 0.04,
-      shadowRadius: 8,
-      elevation: 3,
+      borderWidth: 1,
+      borderColor:
+        Theme.colors
+          .border,
     },
 
     avatar: {
-      width: 50,
-      height: 50,
+      width: 52,
+      height: 52,
       borderRadius: 18,
       backgroundColor:
-        "#EEF2FF",
+        Theme.colors
+          .primarySoft,
       justifyContent:
         "center",
       alignItems:
@@ -652,20 +727,23 @@ const styles =
       fontSize: 18,
       fontWeight: "800",
       color:
-        Theme.colors.primary,
+        Theme.colors
+          .primary,
     },
 
     name: {
       fontSize: 16,
       fontWeight: "700",
       color:
-        Theme.colors.text,
+        Theme.colors
+          .text,
     },
 
     sub: {
       fontSize: 13,
       color:
-        Theme.colors.subtext,
+        Theme.colors
+          .subText,
       marginTop: 4,
     },
 
@@ -678,37 +756,42 @@ const styles =
       alignItems:
         "center",
       backgroundColor:
-        "#FEF2F2",
+        Theme.colors
+          .dangerSoft,
       paddingHorizontal: 8,
       paddingVertical: 5,
       borderRadius: 20,
-      gap: 4,
     },
 
     badgeText: {
-      color: "#DC2626",
+      color:
+        Theme.colors
+          .danger,
       fontSize: 11,
       fontWeight: "700",
+      marginLeft: 4,
     },
 
     emptyWrap: {
       alignItems:
         "center",
-      marginTop: 70,
+      marginTop: 80,
     },
 
     emptyTitle: {
-      marginTop: 12,
       fontSize: 18,
       fontWeight: "700",
       color:
-        Theme.colors.text,
+        Theme.colors
+          .text,
+      marginTop: 12,
     },
 
     emptyText: {
-      marginTop: 4,
+      marginTop: 6,
       fontSize: 14,
       color:
-        Theme.colors.subtext,
+        Theme.colors
+          .subText,
     },
   });

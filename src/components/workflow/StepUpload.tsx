@@ -548,7 +548,7 @@ const styles =
       marginTop: 4,
       fontSize: 12,
       color:
-        Theme.colors.subtext,
+        Theme.colors.subText,
     },
 
     status: {

@@ -45,9 +45,11 @@ const steps = [
 export default function HowApprovalWorks() {
   return (
     <View style={styles.card}>
-      <Text style={styles.kicker}>
-        Process
-      </Text>
+      <View style={styles.badge}>
+        <Text style={styles.kicker}>
+          Process
+        </Text>
+      </View>
 
       <Text style={styles.title}>
         How Approval Works
@@ -86,8 +88,7 @@ export default function HowApprovalWorks() {
                 </View>
 
                 {index !==
-                  steps.length -
-                    1 && (
+                  steps.length - 1 && (
                   <View
                     style={
                       styles.line
@@ -151,39 +152,65 @@ const styles =
   StyleSheet.create({
     card: {
       backgroundColor:
-        Theme.colors.card,
-      borderRadius: 24,
-      padding: 18,
-      marginBottom: 16,
+        Theme.colors.surface,
+      borderRadius:
+        Theme.radius.xl,
+      padding:
+        Theme.spacing.lg -
+        6,
+      marginBottom:
+        Theme.spacing.md,
+
       borderWidth: 1,
       borderColor:
         Theme.colors.border,
+
+      shadowColor:
+        Theme.colors.shadow,
+      shadowOpacity: 0.05,
+      shadowRadius: 12,
+      shadowOffset: {
+        width: 0,
+        height: 6,
+      },
+      elevation: 3,
+    },
+
+    badge: {
+      alignSelf: "flex-start",
+      backgroundColor:
+        Theme.colors.primarySoft,
+      paddingHorizontal: 12,
+      paddingVertical: 7,
+      borderRadius: 999,
+      marginBottom: 12,
     },
 
     kicker: {
-      fontSize: 12,
-      fontWeight: "800",
+      fontSize: 11,
+      fontWeight: "900",
       color:
         Theme.colors.primary,
       textTransform:
         "uppercase",
-      letterSpacing: 0.4,
+      letterSpacing: 0.5,
     },
 
     title: {
       fontSize: 24,
-      fontWeight: "800",
+      fontWeight: "900",
       color:
         Theme.colors.text,
-      marginTop: 6,
+      marginTop: 2,
     },
 
     sub: {
       marginTop: 8,
       marginBottom: 18,
       color:
-        Theme.colors.subtext,
+        Theme.colors.subText,
       lineHeight: 20,
+      fontSize: 14,
     },
 
     list: {
@@ -201,9 +228,9 @@ const styles =
     },
 
     number: {
-      width: 26,
-      height: 26,
-      borderRadius: 13,
+      width: 28,
+      height: 28,
+      borderRadius: 14,
       backgroundColor:
         Theme.colors.primary,
       alignItems: "center",
@@ -213,7 +240,7 @@ const styles =
 
     numberText: {
       color:
-        Theme.colors.secondary,
+        Theme.colors.textInverse,
       fontWeight: "900",
       fontSize: 12,
     },
@@ -232,21 +259,26 @@ const styles =
       flexDirection: "row",
       gap: 12,
       backgroundColor:
-        "#F8FAFC",
-      borderRadius: 18,
+        Theme.colors.surfaceAlt,
+      borderRadius:
+        Theme.radius.lg,
       padding: 14,
       marginLeft: 8,
+
+      borderWidth: 1,
+      borderColor:
+        Theme.colors.borderLight,
     },
 
     iconWrap: {
-      width: 36,
-      height: 36,
+      width: 38,
+      height: 38,
       borderRadius: 12,
       alignItems: "center",
       justifyContent:
         "center",
       backgroundColor:
-        "rgba(245,158,11,0.12)",
+        Theme.colors.accentSoft,
     },
 
     textWrap: {
@@ -265,6 +297,6 @@ const styles =
       fontSize: 13,
       lineHeight: 19,
       color:
-        Theme.colors.subtext,
+        Theme.colors.subText,
     },
   });

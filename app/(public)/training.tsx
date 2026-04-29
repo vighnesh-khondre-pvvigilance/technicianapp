@@ -13,12 +13,16 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  StatusBar,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import * as Linking from "expo-linking";
 import { useRouter } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
+import Animated, {
+  FadeInDown,
+} from "react-native-reanimated";
 
 import Screen from "../../src/components/Screen";
 import { Theme } from "../../src/theme/theme";
@@ -75,55 +79,20 @@ export default function TrainingScreen() {
   const [answers, setAnswers] = useState<number[]>([]);
   const [completed, setCompleted] = useState(false);
   const [profileDone, setProfileDone] = useState(false);
-  const [savedScore, setSavedScore] =
-    useState<number | null>(null);
-  const [loading, setLoading] =
-    useState(true);
+  const [savedScore, setSavedScore] = useState<number | null>(null);
 
   const current = quizQuestions[step];
 
-  /* --------------------------------------- */
-  /* LOAD DATA WHEN SCREEN FOCUSED          */
-  /* --------------------------------------- */
   const loadSavedData = async () => {
     try {
-      setLoading(true);
+      const profile = await AsyncStorage.getItem(PROFILE_KEY);
+      const done = await AsyncStorage.getItem(QUIZ_DONE_KEY);
+      const score = await AsyncStorage.getItem(QUIZ_SCORE_KEY);
 
-      const profile =
-        await AsyncStorage.getItem(
-          PROFILE_KEY
-        );
-
-      const done =
-        await AsyncStorage.getItem(
-          QUIZ_DONE_KEY
-        );
-
-      const score =
-        await AsyncStorage.getItem(
-          QUIZ_SCORE_KEY
-        );
-
-      setProfileDone(
-        profile === "true"
-      );
-
-      setCompleted(
-        done === "true"
-      );
-
-      if (score !== null) {
-        setSavedScore(
-          Number(score)
-        );
-      } else {
-        setSavedScore(null);
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
+      setProfileDone(profile === "true");
+      setCompleted(done === "true");
+      setSavedScore(score ? Number(score) : null);
+    } catch {}
   };
 
   useFocusEffect(
@@ -136,15 +105,10 @@ export default function TrainingScreen() {
     loadSavedData();
   }, []);
 
-  /* --------------------------------------- */
-  /* SCORE                                  */
-  /* --------------------------------------- */
   const liveScore = useMemo(() => {
     return answers.filter(
       (item, index) =>
-        item ===
-        quizQuestions[index]
-          ?.answer
+        item === quizQuestions[index]?.answer
     ).length;
   }, [answers]);
 
@@ -157,147 +121,99 @@ export default function TrainingScreen() {
     completed &&
     score >= PASS_SCORE;
 
-  const progress =
-    completed
-      ? 100
-      : ((step + 1) /
-          quizQuestions.length) *
-        100;
+  const progress = completed
+    ? 100
+    : ((step + 1) /
+        quizQuestions.length) *
+      100;
 
-  /* --------------------------------------- */
-  /* VIDEO                                  */
-  /* --------------------------------------- */
-  const openVideo = async (
-    url: string
-  ) => {
+  const technicianId =
+    "PVP" +
+    (1000 + score * 12).toString();
+
+  const openVideo = async (url: string) => {
     const supported =
-      await Linking.canOpenURL(
-        url
-      );
+      await Linking.canOpenURL(url);
 
     if (supported) {
-      await Linking.openURL(
-        url
-      );
+      await Linking.openURL(url);
     }
   };
 
-  /* --------------------------------------- */
-  /* QUIZ                                   */
-  /* --------------------------------------- */
-  const selectAnswer =
-    async (
-      index: number
-    ) => {
-      const updated = [
-        ...answers,
-      ];
+  const selectAnswer = async (
+    index: number
+  ) => {
+    const updated = [...answers];
+    updated[step] = index;
+    setAnswers(updated);
 
-      updated[step] = index;
+    if (
+      step <
+      quizQuestions.length - 1
+    ) {
+      setStep(step + 1);
+      return;
+    }
 
-      setAnswers(updated);
+    const finalScore =
+      updated.filter(
+        (item, i) =>
+          item ===
+          quizQuestions[i]?.answer
+      ).length;
 
-      if (
-        step <
-        quizQuestions.length -
-          1
-      ) {
-        setStep(
-          step + 1
-        );
-        return;
-      }
+    setSavedScore(finalScore);
+    setCompleted(true);
 
-      const finalScore =
-        updated.filter(
-          (
-            item,
-            i
-          ) =>
-            item ===
-            quizQuestions[
-              i
-            ]?.answer
-        ).length;
+    await AsyncStorage.multiSet([
+      [QUIZ_DONE_KEY, "true"],
+      [
+        QUIZ_SCORE_KEY,
+        String(finalScore),
+      ],
+    ]);
+  };
 
-      setSavedScore(
-        finalScore
-      );
+  const restartQuiz = async () => {
+    Alert.alert(
+      "Restart Quiz",
+      "Reset previous attempt?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Restart",
+          onPress: async () => {
+            setStep(0);
+            setAnswers([]);
+            setCompleted(false);
+            setSavedScore(null);
 
-      setCompleted(true);
-
-      await AsyncStorage.multiSet(
-        [
-          [
-            QUIZ_DONE_KEY,
-            "true",
-          ],
-          [
-            QUIZ_SCORE_KEY,
-            String(
-              finalScore
-            ),
-          ],
-        ]
-      );
-    };
-
-  const restartQuiz =
-    async () => {
-      Alert.alert(
-        "Restart Quiz",
-        "Do you want to reset your quiz attempt?",
-        [
-          {
-            text: "Cancel",
-            style:
-              "cancel",
+            await AsyncStorage.multiRemove(
+              [
+                QUIZ_DONE_KEY,
+                QUIZ_SCORE_KEY,
+              ]
+            );
           },
-          {
-            text: "Restart",
-            onPress:
-              async () => {
-                setStep(0);
-                setAnswers(
-                  []
-                );
-                setCompleted(
-                  false
-                );
-                setSavedScore(
-                  null
-                );
+        },
+      ]
+    );
+  };
 
-                await AsyncStorage.multiRemove(
-                  [
-                    QUIZ_DONE_KEY,
-                    QUIZ_SCORE_KEY,
-                  ]
-                );
-              },
-          },
-        ]
-      );
-    };
-
-  /* --------------------------------------- */
-  /* STATUS                                 */
-  /* --------------------------------------- */
   const stages = [
     "Quick Join Complete",
-
     profileDone
       ? "Profile Submitted"
       : "Profile Pending",
-
     completed
       ? "Training Complete"
       : "Training Pending",
-
     completed
       ? "Verification Pending"
       : "Waiting",
-
     passed
       ? "Approved"
       : completed
@@ -305,17 +221,16 @@ export default function TrainingScreen() {
       : "Pending Approval",
   ];
 
-  const technicianId =
-    "PVP" +
-    (
-      1000 + score * 12
-    ).toString();
-
-  /* --------------------------------------- */
-  /* UI                                     */
-  /* --------------------------------------- */
   return (
     <Screen>
+      <StatusBar
+        translucent={false}
+        backgroundColor={
+          Theme.colors.background
+        }
+        barStyle="dark-content"
+      />
+
       <ScrollView
         showsVerticalScrollIndicator={
           false
@@ -325,57 +240,50 @@ export default function TrainingScreen() {
         }
       >
         {/* HERO */}
-        <View style={styles.hero}>
+        <Animated.View
+          entering={FadeInDown.delay(
+            80
+          )}
+          style={styles.hero}
+        >
           <View
-            style={
-              styles.heroCircle1
-            }
+            style={styles.heroGlow1}
           />
           <View
-            style={
-              styles.heroCircle2
-            }
+            style={styles.heroGlow2}
           />
 
-          <Text
-            style={
-              styles.heroTag
-            }
-          >
+          <Text style={styles.heroTag}>
             Training Center
           </Text>
 
-          <Text
-            style={
-              styles.heading
-            }
-          >
-            Learn & Get
-            Verified
+          <Text style={styles.heading}>
+            Learn & Get Verified
           </Text>
 
           <Text
-            style={
-              styles.subheading
-            }
+            style={styles.subheading}
           >
-            Complete your
-            profile, finish
-            training, pass
-            the quiz and get
-            approved.
+            Complete profile,
+            finish training &
+            pass quiz to unlock
+            approval.
           </Text>
-        </View>
+        </Animated.View>
 
         {/* MODULES */}
-        <View style={styles.card}>
+        <Animated.View
+          entering={FadeInDown.delay(
+            120
+          )}
+          style={styles.card}
+        >
           <Text
             style={
               styles.sectionTitle
             }
           >
-            Training
-            Modules
+            Training Modules
           </Text>
 
           {trainingModules.map(
@@ -384,9 +292,7 @@ export default function TrainingScreen() {
               index
             ) => (
               <TouchableOpacity
-                key={
-                  item.id
-                }
+                key={item.id}
                 style={
                   styles.moduleRow
                 }
@@ -408,9 +314,7 @@ export default function TrainingScreen() {
                     name={
                       item.icon as any
                     }
-                    size={
-                      18
-                    }
+                    size={18}
                     color={
                       Theme
                         .colors
@@ -429,9 +333,7 @@ export default function TrainingScreen() {
                       styles.rowText
                     }
                   >
-                    {
-                      item.title
-                    }
+                    {item.title}
                   </Text>
 
                   <Text
@@ -440,12 +342,8 @@ export default function TrainingScreen() {
                     }
                   >
                     Module{" "}
-                    {index +
-                      1}{" "}
-                    •{" "}
-                    {
-                      item.time
-                    }
+                    {index + 1} •{" "}
+                    {item.time}
                   </Text>
                 </View>
 
@@ -456,90 +354,97 @@ export default function TrainingScreen() {
                 >
                   <Ionicons
                     name="logo-youtube"
-                    size={
-                      18
-                    }
+                    size={18}
                     color="#FF0000"
                   />
                 </View>
               </TouchableOpacity>
             )
           )}
-        </View>
+        </Animated.View>
 
         {/* PROFILE */}
-        <TouchableOpacity
-          style={
-            styles.profileBtn
-          }
-          activeOpacity={
-            0.88
-          }
-          onPress={() =>
-            router.push(
-              "/ProfileForm"
-            )
-          }
+        <Animated.View
+          entering={FadeInDown.delay(
+            160
+          )}
         >
-          <View
+          <TouchableOpacity
             style={
-              styles.profileLeft
+              styles.profileBtn
+            }
+            activeOpacity={
+              0.88
+            }
+            onPress={() =>
+              router.push(
+                "/ProfileForm"
+              )
             }
           >
             <View
               style={
-                styles.profileIcon
+                styles.profileLeft
               }
             >
-              <Ionicons
-                name={
-                  profileDone
-                    ? "checkmark-circle-outline"
-                    : "person-add-outline"
-                }
-                size={
-                  18
-                }
-                color={
-                  Theme
-                    .colors
-                    .primary
-                }
-              />
-            </View>
-
-            <View>
-              <Text
+              <View
                 style={
-                  styles.profileTitle
+                  styles.profileIcon
                 }
               >
-                {profileDone
-                  ? "Update Profile"
-                  : "Complete Profile"}
-              </Text>
+                <Ionicons
+                  name={
+                    profileDone
+                      ? "checkmark-circle-outline"
+                      : "person-add-outline"
+                  }
+                  size={18}
+                  color={
+                    Theme
+                      .colors
+                      .primary
+                  }
+                />
+              </View>
 
-              <Text
-                style={
-                  styles.profileSub
-                }
-              >
-                {profileDone
-                  ? "Your profile is submitted"
-                  : "Submit details to continue"}
-              </Text>
+              <View>
+                <Text
+                  style={
+                    styles.profileTitle
+                  }
+                >
+                  {profileDone
+                    ? "Update Profile"
+                    : "Complete Profile"}
+                </Text>
+
+                <Text
+                  style={
+                    styles.profileSub
+                  }
+                >
+                  {profileDone
+                    ? "Your details are submitted"
+                    : "Submit details to continue"}
+                </Text>
+              </View>
             </View>
-          </View>
 
-          <Ionicons
-            name="chevron-forward"
-            size={18}
-            color="#94A3B8"
-          />
-        </TouchableOpacity>
+            <Ionicons
+              name="chevron-forward"
+              size={18}
+              color="#94A3B8"
+            />
+          </TouchableOpacity>
+        </Animated.View>
 
         {/* QUIZ */}
-        <View style={styles.card}>
+        <Animated.View
+          entering={FadeInDown.delay(
+            220
+          )}
+          style={styles.card}
+        >
           <View
             style={
               styles.rowBetween
@@ -593,9 +498,7 @@ export default function TrainingScreen() {
                 }
               >
                 Question{" "}
-                {step +
-                  1}{" "}
-                of{" "}
+                {step + 1} of{" "}
                 {
                   quizQuestions.length
                 }
@@ -617,9 +520,7 @@ export default function TrainingScreen() {
                   index
                 ) => (
                   <TouchableOpacity
-                    key={
-                      index
-                    }
+                    key={index}
                     style={
                       styles.option
                     }
@@ -658,7 +559,7 @@ export default function TrainingScreen() {
                     passed
                       ? Theme
                           .colors
-                          .primary
+                          .success
                       : Theme
                           .colors
                           .danger
@@ -670,7 +571,6 @@ export default function TrainingScreen() {
                     styles.score
                   }
                 >
-                  Score:{" "}
                   {score}/
                   {
                     quizQuestions.length
@@ -695,21 +595,25 @@ export default function TrainingScreen() {
               >
                 {passed
                   ? "Congratulations! You passed."
-                  : "You can restart and improve score."}
+                  : "Restart quiz and improve your score."}
               </Text>
             </>
           )}
-        </View>
+        </Animated.View>
 
         {/* STATUS */}
-        <View style={styles.card}>
+        <Animated.View
+          entering={FadeInDown.delay(
+            280
+          )}
+          style={styles.card}
+        >
           <Text
             style={
               styles.sectionTitle
             }
           >
-            Onboarding
-            Status
+            Onboarding Status
           </Text>
 
           {stages.map(
@@ -728,9 +632,7 @@ export default function TrainingScreen() {
 
               return (
                 <View
-                  key={
-                    index
-                  }
+                  key={index}
                   style={
                     styles.statusRow
                   }
@@ -774,7 +676,7 @@ export default function TrainingScreen() {
                   styles.idLabel
                 }
               >
-                Technician ID
+                Approved Technician
               </Text>
 
               <Text
@@ -782,310 +684,307 @@ export default function TrainingScreen() {
                   styles.idValue
                 }
               >
-                {
-                  technicianId
-                }
+                {technicianId}
               </Text>
             </View>
           )}
-        </View>
+        </Animated.View>
       </ScrollView>
     </Screen>
   );
 }
 
-const styles =
-  StyleSheet.create({
-    container: {
-      padding: 18,
-      paddingBottom: 42,
-      backgroundColor:
-        Theme.colors
-          .background,
-    },
+const styles = StyleSheet.create({
+  container: {
+    padding: Theme.spacing.sm,
+    paddingBottom: 40,
+    backgroundColor:
+      Theme.colors.background,
+  },
 
-    hero: {
-      backgroundColor:
-        Theme.colors
-          .secondary,
-      borderRadius: 28,
-      padding: 22,
-      overflow: "hidden",
-      marginBottom: 16,
-    },
+  hero: {
+    backgroundColor:
+      Theme.colors.primary,
+    borderRadius:
+      Theme.radius.xl,
+    padding: 22,
+    overflow: "hidden",
+    marginBottom: 14,
+  },
 
-    heroCircle1: {
-      position: "absolute",
-      top: -40,
-      right: -20,
-      width: 120,
-      height: 120,
-      borderRadius: 100,
-      backgroundColor:
-        "rgba(255,255,255,0.06)",
-    },
+  heroGlow1: {
+    position: "absolute",
+    top: -40,
+    right: -30,
+    width: 140,
+    height: 140,
+    borderRadius: 999,
+    backgroundColor:
+      "rgba(255,255,255,0.06)",
+  },
 
-    heroCircle2: {
-      position: "absolute",
-      bottom: -50,
-      left: -20,
-      width: 110,
-      height: 110,
-      borderRadius: 100,
-      backgroundColor:
-        "rgba(255,255,255,0.05)",
-    },
+  heroGlow2: {
+    position: "absolute",
+    bottom: -50,
+    left: -20,
+    width: 120,
+    height: 120,
+    borderRadius: 999,
+    backgroundColor:
+      "rgba(255,255,255,0.05)",
+  },
 
-    heroTag: {
-      color: "#fff",
-      fontSize: 12,
-      fontWeight: "700",
-      backgroundColor:
-        "rgba(255,255,255,0.12)",
-      alignSelf:
-        "flex-start",
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      borderRadius: 999,
-      marginBottom: 16,
-    },
+  heroTag: {
+    color:
+      Theme.colors.textInverse,
+    fontSize: 12,
+    fontWeight: "800",
+    backgroundColor:
+      "rgba(255,255,255,0.12)",
+    alignSelf: "flex-start",
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 999,
+    marginBottom: 14,
+  },
 
-    heading: {
-      fontSize: 28,
-      fontWeight: "800",
-      color: "#fff",
-    },
+  heading: {
+    fontSize: 28,
+    fontWeight: "900",
+    color:
+      Theme.colors.textInverse,
+  },
 
-    subheading: {
-      marginTop: 8,
-      color:
-        "rgba(255,255,255,0.75)",
-      lineHeight: 22,
-    },
+  subheading: {
+    marginTop: 8,
+    fontSize: 14,
+    lineHeight: 22,
+    color:
+      "rgba(255,255,255,0.78)",
+  },
 
-    card: {
-      backgroundColor:
-        Theme.colors.card,
-      borderRadius: 24,
-      padding: 18,
-      marginBottom: 16,
-      borderWidth: 1,
-      borderColor:
-        Theme.colors.border,
-    },
+  card: {
+    backgroundColor:
+      Theme.colors.card,
+    borderRadius:
+      Theme.radius.xl,
+    padding: 18,
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor:
+      Theme.colors.border,
+  },
 
-    sectionTitle: {
-      fontSize: 18,
-      fontWeight: "800",
-      color:
-        Theme.colors.text,
-      marginBottom: 14,
-    },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "900",
+    color: Theme.colors.text,
+    marginBottom: 14,
+  },
 
-    rowBetween: {
-      flexDirection: "row",
-      justifyContent:
-        "space-between",
-      alignItems:
-        "center",
-    },
+  rowBetween: {
+    flexDirection: "row",
+    justifyContent:
+      "space-between",
+    alignItems: "center",
+  },
 
-    resetText: {
-      fontWeight: "700",
-      color:
-        Theme.colors.info,
-    },
+  resetText: {
+    color: Theme.colors.info,
+    fontWeight: "800",
+  },
 
-    moduleRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginBottom: 14,
-    },
+  moduleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 14,
+  },
 
-    iconBox: {
-      width: 42,
-      height: 42,
-      borderRadius: 14,
-      justifyContent:
-        "center",
-      alignItems:
-        "center",
-      backgroundColor:
-        "rgba(245,158,11,0.12)",
-      marginRight: 12,
-    },
+  iconBox: {
+    width: 42,
+    height: 42,
+    borderRadius:
+      Theme.radius.md,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor:
+      Theme.colors.accentSoft,
+    marginRight: 12,
+  },
 
-    playBtn: {
-      width: 38,
-      height: 38,
-      borderRadius: 12,
-      justifyContent:
-        "center",
-      alignItems:
-        "center",
-      backgroundColor:
-        "#FFF1F2",
-    },
+  playBtn: {
+    width: 38,
+    height: 38,
+    borderRadius:
+      Theme.radius.md,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor:
+      Theme.colors.dangerSoft,
+  },
 
-    rowText: {
-      fontSize: 15,
-      fontWeight: "700",
-      color:
-        Theme.colors.text,
-    },
+  rowText: {
+    fontSize: 15,
+    fontWeight: "800",
+    color: Theme.colors.text,
+  },
 
-    meta: {
-      marginTop: 3,
-      fontSize: 12,
-      color:
-        Theme.colors.subtext,
-    },
+  meta: {
+    marginTop: 3,
+    fontSize: 12,
+    color:
+      Theme.colors.subText,
+  },
 
-    profileBtn: {
-      backgroundColor:
-        Theme.colors.card,
-      borderRadius: 24,
-      padding: 18,
-      marginBottom: 16,
-      borderWidth: 1,
-      borderColor:
-        Theme.colors.border,
-      flexDirection: "row",
-      justifyContent:
-        "space-between",
-      alignItems: "center",
-    },
+  profileBtn: {
+    backgroundColor:
+      Theme.colors.card,
+    borderRadius:
+      Theme.radius.xl,
+    padding: 18,
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor:
+      Theme.colors.border,
+    flexDirection: "row",
+    justifyContent:
+      "space-between",
+    alignItems: "center",
+  },
 
-    profileLeft: {
-      flexDirection: "row",
-      alignItems: "center",
-      flex: 1,
-    },
+  profileLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
 
-    profileIcon: {
-      width: 46,
-      height: 46,
-      borderRadius: 16,
-      justifyContent:
-        "center",
-      alignItems:
-        "center",
-      marginRight: 12,
-      backgroundColor:
-        "rgba(245,158,11,0.12)",
-    },
+  profileIcon: {
+    width: 46,
+    height: 46,
+    borderRadius:
+      Theme.radius.lg,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+    backgroundColor:
+      Theme.colors.accentSoft,
+  },
 
-    profileTitle: {
-      fontSize: 16,
-      fontWeight: "800",
-      color:
-        Theme.colors.text,
-    },
+  profileTitle: {
+    fontSize: 16,
+    fontWeight: "900",
+    color: Theme.colors.text,
+  },
 
-    profileSub: {
-      marginTop: 4,
-      fontSize: 13,
-      color:
-        Theme.colors.subtext,
-    },
+  profileSub: {
+    marginTop: 4,
+    fontSize: 13,
+    color:
+      Theme.colors.subText,
+  },
 
-    progressTrack: {
-      height: 8,
-      borderRadius: 99,
-      backgroundColor:
-        "#E5E7EB",
-      overflow: "hidden",
-      marginBottom: 14,
-    },
+  progressTrack: {
+    height: 8,
+    borderRadius: 99,
+    overflow: "hidden",
+    backgroundColor:
+      Theme.colors.border,
+    marginBottom: 14,
+  },
 
-    progressFill: {
-      height: "100%",
-      backgroundColor:
-        Theme.colors.primary,
-    },
+  progressFill: {
+    height: "100%",
+    backgroundColor:
+      Theme.colors.accent,
+  },
 
-    stepText: {
-      fontSize: 12,
-      marginBottom: 8,
-      color:
-        Theme.colors.subtext,
-    },
+  stepText: {
+    fontSize: 12,
+    color:
+      Theme.colors.subText,
+    fontWeight: "700",
+    marginBottom: 8,
+  },
 
-    question: {
-      fontSize: 16,
-      fontWeight: "800",
-      color:
-        Theme.colors.text,
-      marginBottom: 12,
-      lineHeight: 24,
-    },
+  question: {
+    fontSize: 16,
+    fontWeight: "900",
+    color: Theme.colors.text,
+    lineHeight: 24,
+    marginBottom: 12,
+  },
 
-    option: {
-      borderWidth: 1,
-      borderColor:
-        Theme.colors.border,
-      borderRadius: 16,
-      padding: 14,
-      marginBottom: 10,
-      backgroundColor:
-        "#F8FAFC",
-    },
+  option: {
+    borderWidth: 1,
+    borderColor:
+      Theme.colors.border,
+    borderRadius:
+      Theme.radius.lg,
+    padding: 14,
+    marginBottom: 10,
+    backgroundColor:
+      Theme.colors.surfaceAlt,
+  },
 
-    optionText: {
-      fontSize: 14,
-      fontWeight: "600",
-      color:
-        Theme.colors.text,
-    },
+  optionText: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: Theme.colors.text,
+  },
 
-    resultBox: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 8,
-    },
+  resultBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
 
-    score: {
-      fontSize: 22,
-      fontWeight: "800",
-      color:
-        Theme.colors.primary,
-    },
+  score: {
+    fontSize: 24,
+    fontWeight: "900",
+    color:
+      Theme.colors.accent,
+  },
 
-    saved: {
-      marginTop: 8,
-      fontWeight: "700",
-    },
+  saved: {
+    marginTop: 8,
+    fontWeight: "800",
+  },
 
-    statusRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginBottom: 12,
-    },
+  statusRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+  },
 
-    statusText: {
-      marginLeft: 10,
-      fontWeight: "600",
-      color:
-        Theme.colors.text,
-    },
+  statusText: {
+    marginLeft: 10,
+    fontWeight: "700",
+    color: Theme.colors.text,
+  },
 
-    idBox: {
-      marginTop: 10,
-      backgroundColor:
-        "#FFF7ED",
-      borderRadius: 18,
-      padding: 16,
-    },
+  idBox: {
+    marginTop: 12,
+    backgroundColor:
+      Theme.colors.accentSoft,
+    borderRadius:
+      Theme.radius.lg,
+    padding: 16,
+    borderWidth: 1,
+    borderColor:
+      Theme.colors.accent,
+  },
 
-    idLabel: {
-      fontSize: 12,
-      color: "#92400E",
-    },
+  idLabel: {
+    fontSize: 12,
+    fontWeight: "700",
+    color:
+      Theme.colors.primary,
+  },
 
-    idValue: {
-      marginTop: 4,
-      fontSize: 20,
-      fontWeight: "900",
-      color: "#92400E",
-    },
-  });
+  idValue: {
+    marginTop: 5,
+    fontSize: 22,
+    fontWeight: "900",
+    color:
+      Theme.colors.primary,
+  },
+});

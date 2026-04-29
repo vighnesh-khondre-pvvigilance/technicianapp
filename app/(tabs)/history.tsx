@@ -1,5 +1,11 @@
 // app/(tabs)/history.tsx
 
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
 import {
   View,
   Text,
@@ -8,13 +14,16 @@ import {
   TouchableOpacity,
   TextInput,
   RefreshControl,
+  ActivityIndicator,
 } from "react-native";
 
-import {
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import Animated, {
+  FadeInDown,
+  FadeInUp,
+  FadeInRight,
+  ZoomIn,
+  Layout,
+} from "react-native-reanimated";
 
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -23,10 +32,7 @@ import Screen from "../../src/components/Screen";
 import { Theme } from "../../src/theme/theme";
 
 import { Work } from "../../src/types/work";
-
-import {
-  getCompletedWork,
-} from "../../src/services/workService";
+import { getCompletedWork } from "../../src/services/workService";
 
 type FilterType =
   | "all"
@@ -94,8 +100,7 @@ export default function History() {
       }
 
       if (
-        filter ===
-        "approved"
+        filter === "approved"
       ) {
         list = list.filter(
           (item) =>
@@ -105,8 +110,7 @@ export default function History() {
       }
 
       if (
-        filter ===
-        "pending"
+        filter === "pending"
       ) {
         list = list.filter(
           (item) =>
@@ -142,6 +146,7 @@ export default function History() {
       data,
       filter,
       search,
+      today,
     ]);
 
   const stats =
@@ -164,7 +169,7 @@ export default function History() {
               "Approved"
           ).length,
       };
-    }, [data]);
+    }, [data, today]);
 
   const formatDate = (
     date?: string
@@ -185,8 +190,10 @@ export default function History() {
 
   const renderItem = ({
     item,
+    index,
   }: {
     item: Work;
+    index: number;
   }) => {
     const approval =
       item.adminApproval ||
@@ -197,169 +204,188 @@ export default function History() {
       "Approved";
 
     return (
-      <TouchableOpacity
-        activeOpacity={
-          0.88
-        }
-        style={
-          styles.card
-        }
-        onPress={() =>
-          router.push({
-            pathname:
-              "/history/[id]",
-            params: {
-              id: item.id,
-            },
-          })
-        }
+      <Animated.View
+        entering={FadeInDown.delay(
+          index * 70
+        )}
+        layout={Layout.springify()}
       >
-        {/* Top */}
-        <View
+        <TouchableOpacity
+          activeOpacity={
+            0.9
+          }
           style={
-            styles.cardTop
+            styles.card
+          }
+          onPress={() =>
+            router.push({
+              pathname:
+                "/history/[id]",
+              params: {
+                id: item.id,
+              },
+            })
           }
         >
-          <View
-            style={{
-              flex: 1,
-            }}
-          >
-            <Text
-              style={
-                styles.title
-              }
-              numberOfLines={1}
-            >
-              {item.title}
-            </Text>
-
-            <Text
-              style={
-                styles.client
-              }
-              numberOfLines={1}
-            >
-              {item.clientName}
-            </Text>
-          </View>
-
+          {/* Top */}
           <View
             style={
-              styles.doneBadge
+              styles.cardTop
             }
           >
-            <Text
-              style={
-                styles.doneText
-              }
+            <View
+              style={{
+                flex: 1,
+              }}
             >
-              DONE
-            </Text>
-          </View>
-        </View>
+              <Text
+                style={
+                  styles.title
+                }
+                numberOfLines={
+                  1
+                }
+              >
+                {item.title}
+              </Text>
 
-        {/* Middle */}
-        <View
-          style={
-            styles.metaWrap
-          }
-        >
-          <View
-            style={
-              styles.metaItem
-            }
-          >
-            <Ionicons
-              name="leaf-outline"
-              size={14}
-              color="#64748B"
-            />
-
-            <Text
-              style={
-                styles.metaText
-              }
-            >
-              {
-                item.plantName
-              }
-            </Text>
-          </View>
-
-          <View
-            style={
-              styles.metaItem
-            }
-          >
-            <Ionicons
-              name="calendar-outline"
-              size={14}
-              color="#64748B"
-            />
-
-            <Text
-              style={
-                styles.metaText
-              }
-            >
-              {formatDate(
-                item.completedDate
-              )}
-            </Text>
-          </View>
-        </View>
-
-        {/* Footer */}
-        <View
-          style={
-            styles.footer
-          }
-        >
-          <View
-            style={[
-              styles.status,
-              approved
-                ? styles.approved
-                : styles.pending,
-            ]}
-          >
-            <Ionicons
-              name={
-                approved
-                  ? "checkmark-circle"
-                  : "time"
-              }
-              size={14}
-              color={
-                approved
-                  ? "#16A34A"
-                  : "#F59E0B"
-              }
-            />
-
-            <Text
-              style={[
-                styles.statusText,
+              <Text
+                style={
+                  styles.client
+                }
+                numberOfLines={
+                  1
+                }
+              >
                 {
-                  color:
-                    approved
-                      ? "#16A34A"
-                      : "#F59E0B",
-                },
+                  item.clientName
+                }
+              </Text>
+            </View>
+
+            <Animated.View
+              entering={ZoomIn.delay(
+                index * 70
+              )}
+              style={
+                styles.doneBadge
+              }
+            >
+              <Text
+                style={
+                  styles.doneText
+                }
+              >
+                DONE
+              </Text>
+            </Animated.View>
+          </View>
+
+          {/* Meta */}
+          <View
+            style={
+              styles.metaWrap
+            }
+          >
+            <View
+              style={
+                styles.metaItem
+              }
+            >
+              <Ionicons
+                name="leaf-outline"
+                size={14}
+                color="#64748B"
+              />
+
+              <Text
+                style={
+                  styles.metaText
+                }
+              >
+                {
+                  item.plantName
+                }
+              </Text>
+            </View>
+
+            <View
+              style={
+                styles.metaItem
+              }
+            >
+              <Ionicons
+                name="calendar-outline"
+                size={14}
+                color="#64748B"
+              />
+
+              <Text
+                style={
+                  styles.metaText
+                }
+              >
+                {formatDate(
+                  item.completedDate
+                )}
+              </Text>
+            </View>
+          </View>
+
+          {/* Footer */}
+          <View
+            style={
+              styles.footer
+            }
+          >
+            <Animated.View
+              entering={FadeInRight.delay(
+                120
+              )}
+              style={[
+                styles.status,
+                approved
+                  ? styles.approved
+                  : styles.pending,
               ]}
             >
-              {approval}
-            </Text>
-          </View>
+              <Ionicons
+                name={
+                  approved
+                    ? "checkmark-circle"
+                    : "time"
+                }
+                size={14}
+                color={
+                  approved
+                    ? "#16A34A"
+                    : "#F59E0B"
+                }
+              />
 
-          <Ionicons
-            name="chevron-forward"
-            size={18}
-            color="#94A3B8"
-          />
-        </View>
-      </TouchableOpacity>
+              <Text
+                style={[
+                  styles.statusText,
+                  {
+                    color:
+                      approved
+                        ? "#16A34A"
+                        : "#F59E0B",
+                  },
+                ]}
+              >
+                {approval}
+              </Text>
+            </Animated.View>
+
+            <Ionicons
+              name="chevron-forward"
+              size={18}
+              color="#94A3B8"
+            />
+          </View>
+        </TouchableOpacity>
+      </Animated.View>
     );
   };
 
@@ -388,6 +414,10 @@ export default function History() {
             }
           />
         }
+        contentContainerStyle={{
+          paddingBottom: 30,
+          paddingHorizontal: 6,
+        }}
         ListHeaderComponent={
           <View
             style={
@@ -395,7 +425,10 @@ export default function History() {
             }
           >
             {/* Header */}
-            <View
+            <Animated.View
+              entering={FadeInUp.duration(
+                700
+              )}
               style={
                 styles.headerRow
               }
@@ -429,7 +462,7 @@ export default function History() {
                   color="#fff"
                 />
               </View>
-            </View>
+            </Animated.View>
 
             {/* Stats */}
             <View
@@ -442,6 +475,7 @@ export default function History() {
                   stats.total
                 }
                 label="Total"
+                index={0}
               />
 
               <StatCard
@@ -449,6 +483,7 @@ export default function History() {
                   stats.today
                 }
                 label="Today"
+                index={1}
               />
 
               <StatCard
@@ -456,11 +491,15 @@ export default function History() {
                   stats.approved
                 }
                 label="Approved"
+                index={2}
               />
             </View>
 
             {/* Search */}
-            <View
+            <Animated.View
+              entering={FadeInRight.delay(
+                180
+              )}
               style={
                 styles.searchBox
               }
@@ -477,15 +516,20 @@ export default function History() {
                 }
                 placeholder="Search history..."
                 placeholderTextColor="#94A3B8"
-                value={search}
+                value={
+                  search
+                }
                 onChangeText={
                   setSearch
                 }
               />
-            </View>
+            </Animated.View>
 
             {/* Filters */}
-            <View
+            <Animated.View
+              entering={FadeInUp.delay(
+                230
+              )}
               style={
                 styles.filterRow
               }
@@ -496,42 +540,64 @@ export default function History() {
                 "approved",
                 "pending",
               ].map(
-                (item) => (
-                  <TouchableOpacity
+                (
+                  item,
+                  index
+                ) => (
+                  <Animated.View
                     key={
                       item
                     }
-                    style={[
-                      styles.tab,
-                      filter ===
-                        item &&
-                        styles.activeTab,
-                    ]}
-                    onPress={() =>
-                      setFilter(
-                        item as FilterType
-                      )
-                    }
+                    entering={ZoomIn.delay(
+                      index *
+                        70
+                    )}
                   >
-                    <Text
+                    <TouchableOpacity
                       style={[
-                        styles.tabText,
+                        styles.tab,
                         filter ===
                           item &&
-                          styles.activeText,
+                          styles.activeTab,
                       ]}
+                      onPress={() =>
+                        setFilter(
+                          item as FilterType
+                        )
+                      }
                     >
-                      {item}
-                    </Text>
-                  </TouchableOpacity>
+                      <Text
+                        style={[
+                          styles.tabText,
+                          filter ===
+                            item &&
+                            styles.activeText,
+                        ]}
+                      >
+                        {item}
+                      </Text>
+                    </TouchableOpacity>
+                  </Animated.View>
                 )
               )}
-            </View>
+            </Animated.View>
           </View>
         }
         ListEmptyComponent={
-          !loading ? (
-            <View
+          loading ? (
+            <ActivityIndicator
+              size="large"
+              color={
+                Theme.colors
+                  .primary
+              }
+              style={{
+                marginTop: 60,
+              }}
+            />
+          ) : (
+            <Animated.View
+              entering={FadeInUp}
               style={
                 styles.empty
               }
@@ -555,16 +621,13 @@ export default function History() {
                   styles.emptyText
                 }
               >
-                Completed jobs will
-                appear here
+                Completed jobs
+                will appear
+                here
               </Text>
-            </View>
-          ) : null
+            </Animated.View>
+          )
         }
-        contentContainerStyle={{
-          paddingBottom: 30,
-          paddingHorizontal: 6,
-        }}
       />
     </Screen>
   );
@@ -573,12 +636,17 @@ export default function History() {
 function StatCard({
   value,
   label,
+  index,
 }: {
   value: number;
   label: string;
+  index: number;
 }) {
   return (
-    <View
+    <Animated.View
+      entering={ZoomIn.delay(
+        index * 120
+      )}
       style={
         styles.statCard
       }
@@ -598,7 +666,7 @@ function StatCard({
       >
         {label}
       </Text>
-    </View>
+    </Animated.View>
   );
 }
 
@@ -621,22 +689,22 @@ const styles =
     smallHead: {
       fontSize: 13,
       color:
-        Theme.colors.subtext,
-      fontWeight: "600",
+        Theme.colors.subText,
+      fontWeight: "700",
     },
 
     header: {
       fontSize: 28,
       fontWeight:
-        "800",
+        "900",
       color:
         Theme.colors.text,
       marginTop: 2,
     },
 
     iconBtn: {
-      width: 46,
-      height: 46,
+      width: 48,
+      height: 48,
       borderRadius: 16,
       backgroundColor:
         Theme.colors.primary,
@@ -656,18 +724,29 @@ const styles =
     statCard: {
       flex: 1,
       backgroundColor:
-        "#fff",
+        Theme.colors.surface,
       borderRadius: 20,
       padding: 14,
       alignItems:
         "center",
+      borderWidth: 1,
+      borderColor:
+        Theme.colors.border,
+      shadowColor:
+        "#000",
+      shadowOpacity: 0.05,
+      shadowRadius: 10,
+      shadowOffset: {
+        width: 0,
+        height: 5,
+      },
       elevation: 2,
     },
 
     statValue: {
       fontSize: 24,
       fontWeight:
-        "800",
+        "900",
       color:
         Theme.colors.primary,
     },
@@ -684,11 +763,14 @@ const styles =
       alignItems:
         "center",
       backgroundColor:
-        "#fff",
+        Theme.colors.surface,
       borderRadius: 18,
       paddingHorizontal: 14,
       marginBottom: 14,
       height: 52,
+      borderWidth: 1,
+      borderColor:
+        Theme.colors.border,
     },
 
     input: {
@@ -711,11 +793,16 @@ const styles =
       paddingVertical: 8,
       borderRadius: 20,
       backgroundColor:
-        "#fff",
+        Theme.colors.surface,
+      borderWidth: 1,
+      borderColor:
+        Theme.colors.border,
     },
 
     activeTab: {
       backgroundColor:
+        Theme.colors.primary,
+      borderColor:
         Theme.colors.primary,
     },
 
@@ -734,10 +821,21 @@ const styles =
 
     card: {
       backgroundColor:
-        "#fff",
+        Theme.colors.surface,
       borderRadius: 22,
       padding: 16,
       marginBottom: 12,
+      borderWidth: 1,
+      borderColor:
+        Theme.colors.border,
+      shadowColor:
+         Theme.colors.border,
+      shadowOpacity: 0.05,
+      shadowRadius: 10,
+      shadowOffset: {
+        width: 0,
+        height: 5,
+      },
       elevation: 2,
     },
 
@@ -776,7 +874,7 @@ const styles =
     doneText: {
       fontSize: 10,
       fontWeight:
-        "800",
+        "900",
       color: "#16A34A",
     },
 
@@ -831,7 +929,7 @@ const styles =
     statusText: {
       fontSize: 12,
       fontWeight:
-        "700",
+        "800",
     },
 
     empty: {
@@ -844,7 +942,7 @@ const styles =
       marginTop: 12,
       fontSize: 18,
       fontWeight:
-        "700",
+        "800",
       color:
         Theme.colors.text,
     },

@@ -7,14 +7,17 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
+  StatusBar,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import Animated, {
+  FadeInDown,
+  FadeInUp,
+} from "react-native-reanimated";
 
 import HeroBanner from "./HeroBanner";
-import BenefitGrid from "./BenefitGrid";
 import StatsStrip from "./StatsStrip";
-
 import WhoCanJoin from "./WhoCanJoin";
 import WhyWorkWithUs from "./WhyWorkWithUs";
 import WhatWorkYoullDo from "./WhatWorkYoullDo";
@@ -27,314 +30,339 @@ export default function MainOnboarding() {
   const router = useRouter();
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={
-        styles.content
-      }
-      showsVerticalScrollIndicator={
-        false
-      }
-    >
-      {/* Header */}
-      <View style={styles.topRow}>
-        <View>
-          <Text style={styles.brand}>
-            PVprotech
-          </Text>
+    <>
+      <StatusBar
+        translucent={false}
+        backgroundColor={
+          Theme.colors.background
+        }
+        barStyle="dark-content"
+      />
 
-          <Text style={styles.caption}>
-            Solar Technician Network
-          </Text>
-        </View>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* HEADER */}
+        <Animated.View entering={FadeInDown.delay(100)}>
+          <View style={styles.topRow}>
+            <View>
+              <Text style={styles.brand}>PVprotech</Text>
+              <Text style={styles.caption}>
+                Premium Solar Technician Network
+              </Text>
+            </View>
 
-        <View style={styles.badge}>
-          <View style={styles.dot} />
+            <View style={styles.badge}>
+              <View style={styles.dot} />
+              <Text style={styles.badgeText}>Hiring</Text>
+            </View>
+          </View>
+        </Animated.View>
 
-          <Text
-            style={
-              styles.badgeText
-            }
-          >
-            Hiring
-          </Text>
-        </View>
-      </View>
+        {/* HERO */}
+        <Animated.View entering={FadeInUp.delay(150)}>
+          <HeroBanner />
+        </Animated.View>
 
-      {/* Hero */}
-      <HeroBanner />
+        {/* TRUST */}
+        <Animated.View entering={FadeInUp.delay(200)}>
+          <View style={styles.trustRow}>
+            <View style={styles.trustItem}>
+              <Ionicons
+                name="shield-checkmark"
+                size={15}
+                color={Theme.colors.eco}
+              />
+              <Text style={styles.trustText}>Verified</Text>
+            </View>
 
-      {/* Stats */}
-      <StatsStrip />
+            <View style={styles.separator} />
 
-      {/* Existing Benefits */}
-      {/* <BenefitGrid /> */}
+            <View style={styles.trustItem}>
+              <Ionicons
+                name="people"
+                size={15}
+                color={Theme.colors.info}
+              />
+              <Text style={styles.trustText}>100+ Techs</Text>
+            </View>
 
-      {/* New Sections */}
-      <WhoCanJoin />
+            <View style={styles.separator} />
 
-      <WhyWorkWithUs />
+            <View style={styles.trustItem}>
+              <Ionicons
+                name="star"
+                size={15}
+                color={Theme.colors.accent}
+              />
+              <Text style={styles.trustText}>Top Rated</Text>
+            </View>
+          </View>
+        </Animated.View>
 
-      <WhatWorkYoullDo />
+        {/* STATS */}
+        <Animated.View entering={FadeInUp.delay(250)}>
+          <StatsStrip />
+        </Animated.View>
 
-      <HowApprovalWorks />
+        {/* SECTIONS */}
+        <Animated.View entering={FadeInUp.delay(300)}>
+          <WhoCanJoin />
+        </Animated.View>
 
-      <TechnicianStories />
+        <Animated.View entering={FadeInUp.delay(350)}>
+          <WhyWorkWithUs />
+        </Animated.View>
 
-      {/* CTA Card */}
-      <View style={styles.card}>
-        <View
-          style={
-            styles.smallBadge
-          }
-        >
-          <Ionicons
-            name="flash-outline"
-            size={14}
-            color="#fff"
-          />
+        <Animated.View entering={FadeInUp.delay(400)}>
+          <WhatWorkYoullDo />
+        </Animated.View>
 
-          <Text
-            style={
-              styles.smallBadgeText
-            }
-          >
-            Limited Openings
-          </Text>
-        </View>
+        <Animated.View entering={FadeInUp.delay(450)}>
+          <HowApprovalWorks />
+        </Animated.View>
 
-        <Text style={styles.title}>
-          Ready to Start?
-        </Text>
+        <Animated.View entering={FadeInUp.delay(500)}>
+          <TechnicianStories />
+        </Animated.View>
 
-        <Text style={styles.sub}>
-          Join one of India’s growing
-          solar technician networks
-          and unlock new field
-          opportunities.
-        </Text>
+        {/* CTA */}
+        <Animated.View entering={FadeInUp.delay(550)}>
+          <View style={styles.card}>
+            <View style={styles.smallBadge}>
+              <Ionicons
+                name="flash-outline"
+                size={14}
+                color={Theme.colors.textInverse}
+              />
+              <Text style={styles.smallBadgeText}>
+                Limited Openings
+              </Text>
+            </View>
 
-        {/* Primary */}
-        <TouchableOpacity
-          activeOpacity={0.9}
-          style={
-            styles.primaryBtn
-          }
-          onPress={() =>
-            router.push(
-              "/(public)/training"
-            )
-          }
-        >
-          <Text
-            style={
-              styles.primaryText
-            }
-          >
-            Start Training
-          </Text>
+            <Text style={styles.title}>
+              Ready to Start?
+            </Text>
 
-          <Ionicons
-            name="arrow-forward"
-            size={18}
-            color={
-              Theme.colors.secondary
-            }
-          />
-        </TouchableOpacity>
+            <Text style={styles.sub}>
+              Join one of India’s fastest-growing
+              solar technician networks and unlock
+              premium field opportunities.
+            </Text>
 
-        {/* Secondary */}
-        <View style={styles.row}>
-          <TouchableOpacity
-            style={
-              styles.secondaryBtn
-            }
-            onPress={() =>
-              router.push(
-                "/(public)/login"
-              )
-            }
-          >
-            <Ionicons
-              name="log-in-outline"
-              size={16}
-              color={
-                Theme.colors.text
-              }
-            />
-
-            <Text
-              style={
-                styles.secondaryText
+            <TouchableOpacity
+              activeOpacity={0.92}
+              style={styles.primaryBtn}
+              onPress={() =>
+                router.push("/(public)/training")
               }
             >
-              Login
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </ScrollView>
+              <Text style={styles.primaryText}>
+                Start Training
+              </Text>
+
+              <Ionicons
+                name="arrow-forward"
+                size={18}
+                color={Theme.colors.textInverse}
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.secondaryBtn}
+              onPress={() =>
+                router.push("/(public)/login")
+              }
+            >
+              <Ionicons
+                name="log-in-outline"
+                size={17}
+                color={Theme.colors.primary}
+              />
+
+              <Text style={styles.secondaryText}>
+                Technician Login
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
+      </ScrollView>
+    </>
   );
 }
 
-const styles =
-  StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor:
-        Theme.colors.background,
-    },
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Theme.colors.background,
+  },
 
-    content: {
-      padding: 18,
-      paddingTop: 12,
-      paddingBottom: 42,
-    },
+  content: {
+    paddingHorizontal: Theme.spacing.sm,
+    paddingTop: 14,
+    paddingBottom: 50,
+  },
 
-    topRow: {
-      flexDirection: "row",
-      justifyContent:
-        "space-between",
-      alignItems: "center",
-      marginBottom: 18,
-    },
+  topRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: Theme.spacing.md,
+  },
 
-    brand: {
-      fontSize: 30,
-      fontWeight: "900",
-      color:
-        Theme.colors.secondary,
-      letterSpacing: -0.7,
-    },
+  brand: {
+    fontSize: 30,
+    fontWeight: "900",
+    color: Theme.colors.primary,
+    letterSpacing: -0.6,
+  },
 
-    caption: {
-      marginTop: 4,
-      fontSize: 13,
-      fontWeight: "600",
-      color:
-        Theme.colors.subtext,
-    },
+  caption: {
+    marginTop: 4,
+    fontSize: 13,
+    fontWeight: "600",
+    color: Theme.colors.subText,
+  },
 
-    badge: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 8,
-      backgroundColor:
-        "#DCFCE7",
-      paddingHorizontal: 14,
-      paddingVertical: 9,
-      borderRadius: 999,
-    },
+  badge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    backgroundColor: Theme.colors.ecoSoft,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderRadius: 999,
+  },
 
-    dot: {
-      width: 8,
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 99,
+    backgroundColor: Theme.colors.eco,
+  },
+
+  badgeText: {
+    color: Theme.colors.eco,
+    fontSize: 12,
+    fontWeight: "800",
+  },
+
+  trustRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: Theme.spacing.sm,
+    marginBottom: Theme.spacing.lg,
+  },
+
+  trustItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+
+  trustText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: Theme.colors.subText,
+  },
+
+  separator: {
+    width: 4,
+    height: 4,
+    borderRadius: 99,
+    backgroundColor: Theme.colors.border,
+    marginHorizontal: 12,
+  },
+
+  card: {
+    backgroundColor: Theme.colors.surface,
+    borderRadius: Theme.radius.xl,
+    padding: 22,
+    marginTop: 10,
+    borderWidth: 1,
+    borderColor: Theme.colors.border,
+
+    shadowColor: Theme.colors.shadow,
+    shadowOpacity: 0.08,
+    shadowRadius: 14,
+    shadowOffset: {
+      width: 0,
       height: 8,
-      borderRadius: 99,
-      backgroundColor:
-        "#16A34A",
     },
 
-    badgeText: {
-      color: "#15803D",
-      fontSize: 12,
-      fontWeight: "800",
-    },
+    elevation: 4,
+  },
 
-    card: {
-      backgroundColor:
-        Theme.colors.card,
-      borderRadius: 28,
-      padding: 20,
-      marginTop: 8,
-      borderWidth: 1,
-      borderColor:
-        Theme.colors.border,
-      shadowColor: "#000",
-      shadowOpacity: 0.05,
-      shadowRadius: 10,
-      elevation: 4,
-    },
+  smallBadge: {
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: Theme.colors.primary,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 999,
+    marginBottom: Theme.spacing.md,
+  },
 
-    smallBadge: {
-      alignSelf: "flex-start",
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 6,
-      backgroundColor:
-        Theme.colors.secondary,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      borderRadius: 999,
-      marginBottom: 16,
-    },
+  smallBadgeText: {
+    color: Theme.colors.textInverse,
+    fontSize: 12,
+    fontWeight: "800",
+  },
 
-    smallBadgeText: {
-      color: "#fff",
-      fontSize: 12,
-      fontWeight: "700",
-    },
+  title: {
+    fontSize: 24,
+    fontWeight: "900",
+    color: Theme.colors.text,
+  },
 
-    title: {
-      fontSize: 24,
-      fontWeight: "800",
-      color:
-        Theme.colors.text,
-    },
+  sub: {
+    marginTop: 8,
+    marginBottom: Theme.spacing.md,
+    lineHeight: 22,
+    fontSize: 14,
+    color: Theme.colors.subText,
+  },
 
-    sub: {
-      marginTop: 8,
-      color:
-        Theme.colors.subtext,
-      lineHeight: 22,
-      marginBottom: 18,
-      fontSize: 14,
-    },
+  primaryBtn: {
+    height: 56,
+    borderRadius: Theme.radius.lg,
+    backgroundColor: Theme.colors.accent,
 
-    primaryBtn: {
-      height: 56,
-      borderRadius: 18,
-      backgroundColor:
-        Theme.colors.primary,
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent:
-        "center",
-      gap: 8,
-      marginBottom: 12,
-    },
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
 
-    primaryText: {
-      color:
-        Theme.colors.secondary,
-      fontSize: 15,
-      fontWeight: "900",
-    },
+    marginBottom: 12,
+  },
 
-    row: {
-      flexDirection: "row",
-      gap: 10,
-    },
+  primaryText: {
+    color: Theme.colors.text,
+    fontSize: 15,
+    fontWeight: "900",
+  },
 
-    secondaryBtn: {
-      flex: 1,
-      height: 52,
-      borderRadius: 16,
-      backgroundColor:
-        "#F8FAFC",
-      borderWidth: 1,
-      borderColor:
-        Theme.colors.border,
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent:
-        "center",
-      gap: 8,
-    },
+  secondaryBtn: {
+    height: 52,
+    borderRadius: Theme.radius.md,
+    backgroundColor: Theme.colors.surfaceAlt,
+    borderWidth: 1,
+    borderColor: Theme.colors.border,
 
-    secondaryText: {
-      color:
-        Theme.colors.text,
-      fontSize: 14,
-      fontWeight: "700",
-    },
-  });
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+  },
+
+  secondaryText: {
+    color: Theme.colors.primary,
+    fontSize: 14,
+    fontWeight: "800",
+  },
+});

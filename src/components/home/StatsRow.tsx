@@ -6,6 +6,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 
 import { router } from "expo-router";
@@ -35,13 +36,16 @@ export default function StatsRow() {
   const [loading, setLoading] =
     useState(true);
 
+  const [refreshing, setRefreshing] =
+    useState(false);
+
   useEffect(() => {
     loadData();
   }, []);
 
   const loadData = async () => {
     try {
-      setLoading(true);
+      setRefreshing(true);
 
       const [
         clientsData,
@@ -77,6 +81,7 @@ export default function StatsRow() {
       );
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -85,6 +90,7 @@ export default function StatsRow() {
       label: "Clients",
       value: clients,
       icon: "business",
+      bg: "#EFF6FF",
       color: "#2563EB",
       onPress: () =>
         router.push("/(tabs)/work"),
@@ -94,6 +100,7 @@ export default function StatsRow() {
       label: "Plants",
       value: plants,
       icon: "leaf",
+      bg: "#ECFDF5",
       color: "#16A34A",
       onPress: () =>
         router.push("/(tabs)/work"),
@@ -103,9 +110,12 @@ export default function StatsRow() {
       label: "Done",
       value: done,
       icon: "checkmark-done",
+      bg: "#F5F3FF",
       color: "#7C3AED",
       onPress: () =>
-        router.push("/(tabs)/history"),
+        router.push(
+          "/(tabs)/history"
+        ),
     },
   ];
 
@@ -113,28 +123,47 @@ export default function StatsRow() {
     <View style={styles.wrapper}>
       {/* Header */}
       <View style={styles.topHeader}>
-        <Text style={styles.heading}>
-          Dashboard
-        </Text>
+        <View>
+          <Text style={styles.heading}>
+            Dashboard
+          </Text>
+
+          <Text style={styles.subHeading}>
+            Live work summary
+          </Text>
+        </View>
 
         <TouchableOpacity
+          style={styles.refreshBtn}
+          activeOpacity={0.85}
           onPress={loadData}
         >
-          <Ionicons
-            name="refresh"
-            size={18}
-            color="#64748B"
-          />
+          {refreshing ? (
+            <ActivityIndicator
+              size="small"
+              color={
+                Theme.colors.primary
+              }
+            />
+          ) : (
+            <Ionicons
+              name="refresh"
+              size={18}
+              color={
+                Theme.colors.primary
+              }
+            />
+          )}
         </TouchableOpacity>
       </View>
 
-      {/* Premium Summary */}
+      {/* Stats */}
       <View style={styles.row}>
         {stats.map((item) => (
           <TouchableOpacity
             key={item.label}
             style={styles.card}
-            activeOpacity={0.88}
+            activeOpacity={0.9}
             onPress={item.onPress}
           >
             <View
@@ -142,14 +171,14 @@ export default function StatsRow() {
                 styles.iconWrap,
                 {
                   backgroundColor:
-                    item.color,
+                    item.bg,
                 },
               ]}
             >
               <Ionicons
                 name={item.icon as any}
                 size={18}
-                color="#fff"
+                color={item.color}
               />
             </View>
 
@@ -166,12 +195,12 @@ export default function StatsRow() {
         ))}
       </View>
 
-      {/* Priority Card */}
+      {/* Priority */}
       {!loading &&
         priorityTask && (
           <TouchableOpacity
             style={styles.alertCard}
-            activeOpacity={0.9}
+            activeOpacity={0.92}
             onPress={() =>
               router.push(
                 "/(tabs)/work"
@@ -179,13 +208,15 @@ export default function StatsRow() {
             }
           >
             <View
-              style={
-                styles.alertIcon
-              }
+              style={styles.alertGlow}
+            />
+
+            <View
+              style={styles.alertIcon}
             >
               <Ionicons
-                name="warning"
-                size={20}
+                name="flash"
+                size={18}
                 color="#fff"
               />
             </View>
@@ -239,27 +270,31 @@ export default function StatsRow() {
           </TouchableOpacity>
         )}
 
-      {/* Empty State */}
+      {/* Safe */}
       {!loading &&
         !priorityTask && (
           <View
-            style={
-              styles.safeCard
-            }
+            style={styles.safeCard}
           >
-            <Ionicons
-              name="shield-checkmark"
-              size={18}
-              color="#16A34A"
-            />
+            <View
+              style={
+                styles.safeIcon
+              }
+            >
+              <Ionicons
+                name="shield-checkmark"
+                size={16}
+                color="#16A34A"
+              />
+            </View>
 
             <Text
               style={
                 styles.safeText
               }
             >
-              No high priority
-              visits right now
+              No urgent visits at
+              the moment
             </Text>
           </View>
         )}
@@ -270,7 +305,7 @@ export default function StatsRow() {
 const styles =
   StyleSheet.create({
     wrapper: {
-      marginTop: 18,
+      marginTop: 6,
     },
 
     topHeader: {
@@ -279,13 +314,37 @@ const styles =
         "space-between",
       alignItems:
         "center",
-      marginBottom: 12,
+      marginBottom: 14,
     },
 
     heading: {
-      fontSize: 18,
-      fontWeight: "800",
-      color: "#0F172A",
+      fontSize: 20,
+      fontWeight: "900",
+      color:
+        Theme.colors.text,
+    },
+
+    subHeading: {
+      marginTop: 2,
+      fontSize: 12,
+      color:
+        Theme.colors.subText,
+      fontWeight: "600",
+    },
+
+    refreshBtn: {
+      width: 42,
+      height: 42,
+      borderRadius: 14,
+      backgroundColor:
+        Theme.colors.surface,
+      borderWidth: 1,
+      borderColor:
+        Theme.colors.border,
+      justifyContent:
+        "center",
+      alignItems:
+        "center",
     },
 
     row: {
@@ -295,17 +354,29 @@ const styles =
 
     card: {
       flex: 1,
-      backgroundColor: "#fff",
-      borderRadius: 22,
+      backgroundColor:
+        Theme.colors.surface,
+      borderRadius: 24,
       paddingVertical: 18,
+      paddingHorizontal: 10,
       alignItems: "center",
-      elevation: 2,
+      borderWidth: 1,
+      borderColor:
+        Theme.colors.border,
+      shadowColor: "#000",
+      shadowOpacity: 0.04,
+      shadowRadius: 8,
+      shadowOffset: {
+        width: 0,
+        height: 4,
+      },
+      elevation: 1,
     },
 
     iconWrap: {
-      width: 38,
-      height: 38,
-      borderRadius: 14,
+      width: 42,
+      height: 42,
+      borderRadius: 15,
       justifyContent:
         "center",
       alignItems:
@@ -315,33 +386,47 @@ const styles =
 
     value: {
       fontSize: 24,
-      fontWeight: "800",
-      color: "#0F172A",
+      fontWeight: "900",
+      color:
+        Theme.colors.text,
     },
 
     label: {
       marginTop: 4,
       fontSize: 12,
-      color: "#64748B",
+      color:
+        Theme.colors.subText,
       fontWeight: "700",
     },
 
     alertCard: {
       marginTop: 16,
+      borderRadius: 24,
+      padding: 16,
       backgroundColor:
         "#EF4444",
-      borderRadius: 22,
-      padding: 16,
       flexDirection: "row",
       alignItems: "center",
+      overflow: "hidden",
+    },
+
+    alertGlow: {
+      position: "absolute",
+      right: -20,
+      top: -20,
+      width: 120,
+      height: 120,
+      borderRadius: 60,
+      backgroundColor:
+        "rgba(255,255,255,0.08)",
     },
 
     alertIcon: {
-      width: 42,
-      height: 42,
-      borderRadius: 14,
+      width: 44,
+      height: 44,
+      borderRadius: 15,
       backgroundColor:
-        "rgba(255,255,255,0.18)",
+        "rgba(255,255,255,0.16)",
       justifyContent:
         "center",
       alignItems:
@@ -351,14 +436,14 @@ const styles =
     alertTitle: {
       color: "#fff",
       fontSize: 14,
-      fontWeight: "800",
+      fontWeight: "900",
     },
 
     alertText: {
       color: "#FEE2E2",
-      marginTop: 2,
+      marginTop: 3,
       fontSize: 13,
-      fontWeight: "600",
+      fontWeight: "700",
     },
 
     alertSub: {
@@ -371,16 +456,31 @@ const styles =
       marginTop: 16,
       backgroundColor:
         "#ECFDF5",
-      borderRadius: 18,
+      borderRadius: 20,
       padding: 14,
       flexDirection: "row",
       alignItems: "center",
-      gap: 8,
+      borderWidth: 1,
+      borderColor: "#D1FAE5",
+    },
+
+    safeIcon: {
+      width: 32,
+      height: 32,
+      borderRadius: 10,
+      backgroundColor:
+        "#D1FAE5",
+      justifyContent:
+        "center",
+      alignItems:
+        "center",
+      marginRight: 10,
     },
 
     safeText: {
+      flex: 1,
       color: "#166534",
-      fontWeight: "700",
+      fontWeight: "800",
       fontSize: 13,
     },
   });

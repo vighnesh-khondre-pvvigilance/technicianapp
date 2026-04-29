@@ -214,7 +214,6 @@ export default function ProfileForm() {
             <View
               style={styles.heroCircle1}
             />
-
             <View
               style={styles.heroCircle2}
             />
@@ -243,7 +242,7 @@ export default function ProfileForm() {
             </Text>
           </View>
 
-          {/* Form Card */}
+          {/* Form */}
           <View style={styles.card}>
             <SectionTitle
               title="Personal Details"
@@ -412,7 +411,7 @@ export default function ProfileForm() {
 
             <TouchableOpacity
               style={styles.button}
-              activeOpacity={0.88}
+              activeOpacity={0.9}
               onPress={
                 saveProfile
               }
@@ -423,7 +422,7 @@ export default function ProfileForm() {
                 size={18}
                 color={
                   Theme.colors
-                    .secondary
+                    .textInverse
                 }
               />
 
@@ -469,7 +468,7 @@ function Input({
       <TextInput
         placeholderTextColor={
           Theme.colors
-            .subtext
+            .subText
         }
         style={styles.input}
         {...props}
@@ -554,11 +553,7 @@ function SwitchRow({
         />
       </View>
 
-      <View
-        style={{
-          flex: 1,
-        }}
-      >
+      <View style={{ flex: 1 }}>
         <Text
           style={
             styles.switchTitle
@@ -584,11 +579,15 @@ function SwitchRow({
         trackColor={{
           true: Theme
             .colors
-            .primary,
+            .eco,
           false:
             Theme.colors
               .border,
         }}
+        thumbColor={
+          Theme.colors
+            .surface
+        }
       />
     </View>
   );
@@ -607,8 +606,9 @@ const styles =
     hero: {
       backgroundColor:
         Theme.colors
-          .secondary,
-      borderRadius: 28,
+          .primary,
+      borderRadius:
+        Theme.radius.xl,
       padding: 22,
       overflow: "hidden",
       marginBottom: 16,
@@ -633,15 +633,17 @@ const styles =
       height: 110,
       borderRadius: 100,
       backgroundColor:
-        "rgba(255,255,255,0.05)",
+        "rgba(255,255,255,0.04)",
     },
 
     heroTag: {
-      color: "#fff",
+      color:
+        Theme.colors
+          .textInverse,
       fontSize: 12,
-      fontWeight: "700",
+      fontWeight: "800",
       backgroundColor:
-        "rgba(255,255,255,0.12)",
+        "rgba(255,255,255,0.10)",
       alignSelf:
         "flex-start",
       paddingHorizontal: 12,
@@ -652,31 +654,48 @@ const styles =
 
     heading: {
       fontSize: 28,
-      fontWeight: "800",
-      color: "#fff",
+      fontWeight: "900",
+      color:
+        Theme.colors
+          .textInverse,
     },
 
     subheading: {
       marginTop: 8,
       color:
-        "rgba(255,255,255,0.75)",
+        "rgba(255,255,255,0.78)",
       lineHeight: 22,
+      fontSize: 14,
     },
 
     card: {
       backgroundColor:
-        Theme.colors.card,
-      borderRadius: 24,
+        Theme.colors
+          .surface,
+      borderRadius:
+        Theme.radius.xl,
       padding: 18,
       borderWidth: 1,
       borderColor:
         Theme.colors
           .border,
+
+      shadowColor:
+        Theme.colors
+          .shadow,
+      shadowOpacity: 0.06,
+      shadowRadius: 12,
+      shadowOffset: {
+        width: 0,
+        height: 6,
+      },
+
+      elevation: 3,
     },
 
     section: {
       fontSize: 18,
-      fontWeight: "800",
+      fontWeight: "900",
       color:
         Theme.colors.text,
       marginBottom: 14,
@@ -691,22 +710,26 @@ const styles =
       fontSize: 14,
       fontWeight: "700",
       color:
-        Theme.colors.text,
+        Theme.colors
+          .text,
       marginBottom: 8,
     },
 
     input: {
       height: 54,
-      borderRadius: 16,
+      borderRadius:
+        Theme.radius.lg,
       borderWidth: 1,
       borderColor:
         Theme.colors
           .border,
       backgroundColor:
-        "#F8FAFC",
+        Theme.colors
+          .surfaceAlt,
       paddingHorizontal: 14,
       color:
         Theme.colors.text,
+      fontSize: 14,
     },
 
     chipWrap: {
@@ -724,7 +747,8 @@ const styles =
         Theme.colors
           .border,
       backgroundColor:
-        "#F8FAFC",
+        Theme.colors
+          .surfaceAlt,
     },
 
     chipActive: {
@@ -745,16 +769,18 @@ const styles =
     chipTextActive: {
       color:
         Theme.colors
-          .secondary,
+          .textInverse,
     },
 
     switchRow: {
       flexDirection: "row",
       alignItems: "center",
       padding: 14,
-      borderRadius: 18,
+      borderRadius:
+        Theme.radius.lg,
       backgroundColor:
-        "#F8FAFC",
+        Theme.colors
+          .surfaceAlt,
       marginBottom: 12,
     },
 
@@ -767,12 +793,13 @@ const styles =
       alignItems:
         "center",
       backgroundColor:
-        "rgba(245,158,11,0.12)",
+        Theme.colors
+          .accentSoft,
       marginRight: 12,
     },
 
     switchTitle: {
-      fontWeight: "700",
+      fontWeight: "800",
       color:
         Theme.colors.text,
     },
@@ -782,15 +809,16 @@ const styles =
       marginTop: 4,
       color:
         Theme.colors
-          .subtext,
+          .subText,
     },
 
     button: {
       height: 56,
-      borderRadius: 18,
+      borderRadius:
+        Theme.radius.lg,
       backgroundColor:
         Theme.colors
-          .primary,
+          .accent,
       justifyContent:
         "center",
       alignItems:
@@ -801,10 +829,9 @@ const styles =
     },
 
     buttonText: {
-      fontWeight: "800",
+      fontWeight: "900",
       fontSize: 15,
       color:
-        Theme.colors
-          .secondary,
+        Theme.colors.text,
     },
   });

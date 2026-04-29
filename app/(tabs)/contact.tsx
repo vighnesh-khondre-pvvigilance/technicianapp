@@ -1,4 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
+// app/(tabs)/contact.tsx
+
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+
 import {
   View,
   Text,
@@ -7,16 +15,31 @@ import {
   StyleSheet,
   TouchableOpacity,
   Linking,
-  Animated,
   Dimensions,
   ActivityIndicator,
+  Animated,
 } from "react-native";
+
 import { Ionicons } from "@expo/vector-icons";
+
+import ReAnimated, {
+  FadeInDown,
+  FadeInUp,
+  FadeInRight,
+  ZoomIn,
+} from "react-native-reanimated";
+
 import Screen from "../../src/components/Screen";
 import { Theme } from "../../src/theme/theme";
 
-import { Contact, Role } from "../../src/types/contact";
-import { getContacts } from "../../src/services/contactService";
+import {
+  Contact,
+  Role,
+} from "../../src/types/contact";
+
+import {
+  getContacts,
+} from "../../src/services/contactService";
 
 const ROLES: (Role | "All")[] = [
   "All",
@@ -25,73 +48,137 @@ const ROLES: (Role | "All")[] = [
   "Technician",
 ];
 
-const SCREEN_WIDTH = Dimensions.get("window").width;
-const TAB_WIDTH = (SCREEN_WIDTH - 28) / ROLES.length;
+const SCREEN_WIDTH =
+  Dimensions.get(
+    "window"
+  ).width;
+
+const TAB_WIDTH =
+  (SCREEN_WIDTH - 28) /
+  ROLES.length;
 
 export default function ContactScreen() {
-  const [contacts, setContacts] = useState<Contact[]>([]);
-  const [search, setSearch] = useState("");
-  const [selectedRole, setSelectedRole] =
-    useState<Role | "All">("All");
-  const [loading, setLoading] = useState(true);
+  const [
+    contacts,
+    setContacts,
+  ] = useState<
+    Contact[]
+  >([]);
 
+  const [
+    search,
+    setSearch,
+  ] = useState("");
+
+  const [
+    selectedRole,
+    setSelectedRole,
+  ] = useState<
+    Role | "All"
+  >("All");
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
+
+  // IMPORTANT:
+  // use RN Animated here
   const indicatorX =
-    useRef(new Animated.Value(0)).current;
+    useRef(
+      new Animated.Value(0)
+    ).current;
 
   useEffect(() => {
     loadContacts();
   }, []);
 
-  const loadContacts = async () => {
-    try {
-      const data = await getContacts();
-      setContacts(data);
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const loadContacts =
+    async () => {
+      try {
+        const data =
+          await getContacts();
+
+        setContacts(data);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
   const handleSelect = (
     index: number,
-    role: Role | "All"
+    role:
+      | Role
+      | "All"
   ) => {
     setSelectedRole(role);
 
-    Animated.spring(indicatorX, {
-      toValue: index * TAB_WIDTH,
-      useNativeDriver: true,
-    }).start();
+    Animated.spring(
+      indicatorX,
+      {
+        toValue:
+          index *
+          TAB_WIDTH,
+        useNativeDriver:
+          true,
+      }
+    ).start();
   };
 
-  const filteredContacts = contacts.filter(
-    (item) => {
-      const matchSearch =
-        item.name
-          .toLowerCase()
-          .includes(search.toLowerCase()) ||
-        item.email
-          .toLowerCase()
-          .includes(search.toLowerCase()) ||
-        item.phone.includes(search);
+  const filteredContacts =
+    useMemo(() => {
+      return contacts.filter(
+        (item) => {
+          const matchSearch =
+            item.name
+              .toLowerCase()
+              .includes(
+                search.toLowerCase()
+              ) ||
+            item.email
+              .toLowerCase()
+              .includes(
+                search.toLowerCase()
+              ) ||
+            item.phone.includes(
+              search
+            );
 
-      const matchRole =
-        selectedRole === "All" ||
-        item.role === selectedRole;
+          const matchRole =
+            selectedRole ===
+              "All" ||
+            item.role ===
+              selectedRole;
 
-      return matchSearch && matchRole;
-    }
-  );
+          return (
+            matchSearch &&
+            matchRole
+          );
+        }
+      );
+    }, [
+      contacts,
+      search,
+      selectedRole,
+    ]);
 
-  const getInitials = (name: string) =>
+  const getInitials = (
+    name: string
+  ) =>
     name
       .split(" ")
-      .map((w) => w[0])
+      .map(
+        (word) =>
+          word[0]
+      )
       .join("")
       .toUpperCase();
 
-  const getRoleColor = (role: Role) => {
+  const getRoleColor = (
+    role: Role
+  ) => {
     switch (role) {
       case "Super Admin":
         return "#EF4444";
@@ -99,125 +186,238 @@ export default function ContactScreen() {
         return "#2563EB";
       case "Technician":
         return "#10B981";
+      default:
+        return Theme.colors.primary;
     }
   };
 
-  const handleCall = (phone: string) =>
-    Linking.openURL(`tel:${phone}`);
+  const handleCall = (
+    phone: string
+  ) =>
+    Linking.openURL(
+      `tel:${phone}`
+    );
 
-  const handleWhatsApp = (phone: string) =>
+  const handleWhatsApp = (
+    phone: string
+  ) =>
     Linking.openURL(
       `https://wa.me/91${phone}`
     );
 
   const renderItem = ({
     item,
+    index,
   }: {
     item: Contact;
+    index: number;
   }) => (
-    <View style={styles.card}>
-      <View style={styles.row}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>
-            {getInitials(item.name)}
-          </Text>
-        </View>
-
-        <View style={{ flex: 1 }}>
-          <Text style={styles.name}>
-            {item.name}
-          </Text>
-
-          <Text style={styles.info}>
-            {item.email}
-          </Text>
-
-          <Text style={styles.info}>
-            {item.phone}
-          </Text>
-        </View>
-      </View>
-
-      <View style={styles.bottomRow}>
+    <ReAnimated.View
+      entering={FadeInDown.delay(
+        index * 70
+      )}
+    >
+      <TouchableOpacity
+        activeOpacity={
+          0.9
+        }
+        style={
+          styles.card
+        }
+      >
         <View
-          style={[
-            styles.roleBadge,
-            {
-              backgroundColor:
-                getRoleColor(item.role),
-            },
-          ]}
+          style={
+            styles.row
+          }
         >
-          <Text style={styles.roleText}>
-            {item.role}
-          </Text>
-        </View>
-
-        <View style={styles.actions}>
-          <TouchableOpacity
-            style={styles.iconBtn}
-            onPress={() =>
-              handleCall(item.phone)
+          <ReAnimated.View
+            entering={ZoomIn.delay(
+              index * 70
+            )}
+            style={
+              styles.avatar
             }
           >
-            <Ionicons
-              name="call"
-              size={16}
-              color="#fff"
-            />
-          </TouchableOpacity>
+            <Text
+              style={
+                styles.avatarText
+              }
+            >
+              {getInitials(
+                item.name
+              )}
+            </Text>
+          </ReAnimated.View>
 
-          <TouchableOpacity
+          <View
+            style={{
+              flex: 1,
+            }}
+          >
+            <Text
+              style={
+                styles.name
+              }
+            >
+              {item.name}
+            </Text>
+
+            <Text
+              style={
+                styles.info
+              }
+            >
+              {item.email}
+            </Text>
+
+            <Text
+              style={
+                styles.info
+              }
+            >
+              {item.phone}
+            </Text>
+          </View>
+        </View>
+
+        <View
+          style={
+            styles.bottomRow
+          }
+        >
+          <ReAnimated.View
+            entering={FadeInRight.delay(
+              120
+            )}
             style={[
-              styles.iconBtn,
+              styles.roleBadge,
               {
                 backgroundColor:
-                  "#22C55E",
+                  getRoleColor(
+                    item.role
+                  ),
               },
             ]}
-            onPress={() =>
-              handleWhatsApp(
-                item.phone
-              )
+          >
+            <Text
+              style={
+                styles.roleText
+              }
+            >
+              {item.role}
+            </Text>
+          </ReAnimated.View>
+
+          <View
+            style={
+              styles.actions
             }
           >
-            <Ionicons
-              name="logo-whatsapp"
-              size={16}
-              color="#fff"
-            />
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={
+                styles.iconBtn
+              }
+              onPress={() =>
+                handleCall(
+                  item.phone
+                )
+              }
+            >
+              <Ionicons
+                name="call-outline"
+                size={18}
+                color="#fff"
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.iconBtn,
+                {
+                  backgroundColor:
+                    "#22C55E",
+                },
+              ]}
+              onPress={() =>
+                handleWhatsApp(
+                  item.phone
+                )
+              }
+            >
+              <Ionicons
+                name="logo-whatsapp"
+                size={18}
+                color="#fff"
+              />
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-    </View>
+      </TouchableOpacity>
+    </ReAnimated.View>
   );
 
   return (
     <Screen>
-      <View style={styles.container}>
+      <View
+        style={
+          styles.container
+        }
+      >
         {/* Header */}
-        <View style={styles.header}>
+        <ReAnimated.View
+          entering={FadeInUp.delay(
+            80
+          )}
+          style={
+            styles.header
+          }
+        >
           <View>
-            <Text style={styles.small}>
+            <Text
+              style={
+                styles.small
+              }
+            >
               Team Directory
             </Text>
 
-            <Text style={styles.title}>
+            <Text
+              style={
+                styles.title
+              }
+            >
               Contacts
             </Text>
           </View>
 
-          <View style={styles.countBox}>
-            <Text style={styles.count}>
-              {filteredContacts.length}
+          <View
+            style={
+              styles.countBox
+            }
+          >
+            <Text
+              style={
+                styles.count
+              }
+            >
+              {
+                filteredContacts.length
+              }
             </Text>
           </View>
-        </View>
+        </ReAnimated.View>
 
         {/* Search */}
-        <View style={styles.searchWrap}>
+        <ReAnimated.View
+          entering={FadeInDown.delay(
+            140
+          )}
+          style={
+            styles.searchWrap
+          }
+        >
           <Ionicons
-            name="search"
+            name="search-outline"
             size={18}
             color="#94A3B8"
           />
@@ -225,31 +425,47 @@ export default function ContactScreen() {
           <TextInput
             placeholder="Search contacts..."
             placeholderTextColor="#94A3B8"
-            style={styles.searchInput}
+            style={
+              styles.searchInput
+            }
             value={search}
-            onChangeText={setSearch}
+            onChangeText={
+              setSearch
+            }
           />
-        </View>
+        </ReAnimated.View>
 
         {/* Tabs */}
-        <View style={styles.filterContainer}>
+        <ReAnimated.View
+          entering={FadeInDown.delay(
+            220
+          )}
+          style={
+            styles.filterContainer
+          }
+        >
           <Animated.View
             style={[
               styles.activeIndicator,
               {
-                width: TAB_WIDTH,
-                transform: [
-                  {
-                    translateX:
-                      indicatorX,
-                  },
-                ],
+                width:
+                  TAB_WIDTH,
+                transform:
+                  [
+                    {
+                      translateX:
+                        indicatorX,
+                    },
+                  ],
               },
             ]}
           />
 
           {ROLES.map(
-            (role, index) => (
+            (
+              role,
+              index
+            ) => (
               <TouchableOpacity
                 key={role}
                 style={
@@ -275,27 +491,36 @@ export default function ContactScreen() {
               </TouchableOpacity>
             )
           )}
-        </View>
+        </ReAnimated.View>
 
         {/* List */}
         {loading ? (
           <ActivityIndicator
             size="large"
             color={
-              Theme.colors.primary
+              Theme.colors
+                .primary
             }
             style={{
-              marginTop: 40,
+              marginTop: 50,
             }}
           />
         ) : (
           <FlatList
-            style={{ flex: 1 }}
-            data={filteredContacts}
-            keyExtractor={(item) =>
+            style={{
+              flex: 1,
+            }}
+            data={
+              filteredContacts
+            }
+            keyExtractor={(
+              item
+            ) =>
               item.id
             }
-            renderItem={renderItem}
+            renderItem={
+              renderItem
+            }
             showsVerticalScrollIndicator={
               false
             }
@@ -303,14 +528,15 @@ export default function ContactScreen() {
               paddingBottom: 30,
             }}
             ListEmptyComponent={
-              <View
+              <ReAnimated.View
+                entering={FadeInUp}
                 style={
                   styles.emptyBox
                 }
               >
                 <Ionicons
                   name="people-outline"
-                  size={50}
+                  size={54}
                   color="#CBD5E1"
                 />
 
@@ -327,9 +553,10 @@ export default function ContactScreen() {
                     styles.emptyText
                   }
                 >
-                  Try another search
+                  Try another
+                  search
                 </Text>
-              </View>
+              </ReAnimated.View>
             }
           />
         )}
@@ -338,205 +565,241 @@ export default function ContactScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 6,
-    paddingTop: 6,
-  },
+const styles =
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      paddingHorizontal: 8,
+      paddingTop: 6,
+      backgroundColor:
+        Theme.colors
+          .background,
+    },
 
-  header: {
-    flexDirection: "row",
-    justifyContent:
-      "space-between",
-    alignItems: "center",
-    marginBottom: 18,
-  },
+    header: {
+      flexDirection:
+        "row",
+      justifyContent:
+        "space-between",
+      alignItems:
+        "center",
+      marginBottom: 18,
+    },
 
-  small: {
-    fontSize: 13,
-    color:
-      Theme.colors.subtext,
-    fontWeight: "600",
-  },
+    small: {
+      fontSize: 13,
+      fontWeight: "700",
+      color:
+        Theme.colors
+          .subText,
+    },
 
-  title: {
-    fontSize: 28,
-    fontWeight: "800",
-    color:
-      Theme.colors.text,
-    marginTop: 2,
-  },
+    title: {
+      fontSize: 28,
+      fontWeight: "900",
+      color:
+        Theme.colors
+          .text,
+      marginTop: 2,
+    },
 
-  countBox: {
-    width: 46,
-    height: 46,
-    borderRadius: 16,
-    backgroundColor:
-      Theme.colors.primary,
-    justifyContent:
-      "center",
-    alignItems: "center",
-  },
+    countBox: {
+      width: 48,
+      height: 48,
+      borderRadius: 16,
+      backgroundColor:
+        Theme.colors
+          .primary,
+      justifyContent:
+        "center",
+      alignItems:
+        "center",
+    },
 
-  count: {
-    color: "#fff",
-    fontWeight: "800",
-    fontSize: 16,
-  },
+    count: {
+      color: "#fff",
+      fontSize: 16,
+      fontWeight: "900",
+    },
 
-  searchWrap: {
-    backgroundColor: "#fff",
-    borderRadius: 18,
-    paddingHorizontal: 14,
-    paddingVertical: 13,
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 14,
-  },
+    searchWrap: {
+      backgroundColor:
+        "#fff",
+      borderRadius: 18,
+      paddingHorizontal: 14,
+      paddingVertical: 13,
+      flexDirection:
+        "row",
+      alignItems:
+        "center",
+      marginBottom: 14,
+    },
 
-  searchInput: {
-    flex: 1,
-    marginLeft: 10,
-    color: "#111827",
-  },
+    searchInput: {
+      flex: 1,
+      marginLeft: 10,
+      color: "#111827",
+    },
 
-  filterContainer: {
-    flexDirection: "row",
-    backgroundColor: "#EEF2F7",
-    borderRadius: 22,
-    padding: 4,
-    marginBottom: 16,
-    overflow: "hidden",
-  },
+    filterContainer: {
+      flexDirection:
+        "row",
+      backgroundColor:
+        "#EEF2F7",
+      borderRadius: 22,
+      padding: 4,
+      marginBottom: 16,
+      overflow:
+        "hidden",
+    },
 
-  activeIndicator: {
-    position: "absolute",
-    top: 4,
-    bottom: 4,
-    left: 4,
-    backgroundColor: "#fff",
-    borderRadius: 18,
-    elevation: 2,
-  },
+    activeIndicator: {
+      position:
+        "absolute",
+      top: 4,
+      bottom: 4,
+      left: 4,
+      backgroundColor:
+        "#fff",
+      borderRadius: 18,
+      elevation: 2,
+    },
 
-  segment: {
-    flex: 1,
-    paddingVertical: 10,
-    alignItems: "center",
-    zIndex: 2,
-  },
+    segment: {
+      flex: 1,
+      paddingVertical: 10,
+      alignItems:
+        "center",
+      zIndex: 2,
+    },
 
-  segmentText: {
-    fontSize: 12,
-    color: "#64748B",
-    fontWeight: "600",
-  },
+    segmentText: {
+      fontSize: 12,
+      color: "#64748B",
+      fontWeight: "700",
+    },
 
-  activeText: {
-    color:
-      Theme.colors.primary,
-  },
+    activeText: {
+      color:
+        Theme.colors
+          .primary,
+    },
 
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 22,
-    padding: 15,
-    marginBottom: 12,
-    shadowColor: "#000",
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 3,
-  },
+    card: {
+      backgroundColor:
+        Theme.colors
+          .surface,
+      borderRadius: 22,
+      padding: 15,
+      marginBottom: 12,
+      borderWidth: 1,
+      borderColor:
+        Theme.colors
+          .border,
+      
+      
+    },
 
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
+    row: {
+      flexDirection:
+        "row",
+      alignItems:
+        "center",
+    },
 
-  avatar: {
-    width: 52,
-    height: 52,
-    borderRadius: 18,
-    backgroundColor:
-      "#EEF2FF",
-    justifyContent:
-      "center",
-    alignItems: "center",
-    marginRight: 12,
-  },
+    avatar: {
+      width: 52,
+      height: 52,
+      borderRadius: 18,
+      backgroundColor:
+        "#EEF2FF",
+      justifyContent:
+        "center",
+      alignItems:
+        "center",
+      marginRight: 12,
+    },
 
-  avatarText: {
-    fontWeight: "800",
-    fontSize: 16,
-    color:
-      Theme.colors.primary,
-  },
+    avatarText: {
+      fontWeight: "900",
+      fontSize: 16,
+      color:
+        Theme.colors
+          .primary,
+    },
 
-  name: {
-    fontSize: 15,
-    fontWeight: "700",
-    color:
-      Theme.colors.text,
-  },
+    name: {
+      fontSize: 15,
+      fontWeight: "800",
+      color:
+        Theme.colors
+          .text,
+    },
 
-  info: {
-    fontSize: 12,
-    color: "#64748B",
-    marginTop: 3,
-  },
+    info: {
+      fontSize: 12,
+      color: "#64748B",
+      marginTop: 3,
+    },
 
-  bottomRow: {
-    marginTop: 14,
-    flexDirection: "row",
-    justifyContent:
-      "space-between",
-    alignItems: "center",
-  },
+    bottomRow: {
+      marginTop: 14,
+      flexDirection:
+        "row",
+      justifyContent:
+        "space-between",
+      alignItems:
+        "center",
+    },
 
-  roleBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 20,
-  },
+    roleBadge: {
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      borderRadius: 20,
+    },
 
-  roleText: {
-    color: "#fff",
-    fontSize: 11,
-    fontWeight: "700",
-  },
+    roleText: {
+      color: "#fff",
+      fontSize: 11,
+      fontWeight: "800",
+    },
 
-  actions: {
-    flexDirection: "row",
-    gap: 8,
-  },
+    actions: {
+      flexDirection:
+        "row",
+      gap: 8,
+    },
 
-  iconBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 14,
-    backgroundColor:
-      Theme.colors.primary,
-    justifyContent:
-      "center",
-    alignItems: "center",
-  },
+    iconBtn: {
+      width: 36,
+      height: 36,
+      borderRadius: 14,
+      backgroundColor:
+        Theme.colors
+          .primary,
+      justifyContent:
+        "center",
+      alignItems:
+        "center",
+    },
 
-  emptyBox: {
-    marginTop: 80,
-    alignItems: "center",
-  },
+    emptyBox: {
+      marginTop: 80,
+      alignItems:
+        "center",
+    },
 
-  emptyTitle: {
-    marginTop: 14,
-    fontSize: 18,
-    fontWeight: "700",
-    color:
-      Theme.colors.text,
-  },
+    emptyTitle: {
+      marginTop: 14,
+      fontSize: 18,
+      fontWeight: "800",
+      color:
+        Theme.colors
+          .text,
+    },
 
-  emptyText: {
-    marginTop: 4,
-    color: "#94A3B8",
-  },
-});
+    emptyText: {
+      marginTop: 4,
+      color: "#94A3B8",
+    },
+  });

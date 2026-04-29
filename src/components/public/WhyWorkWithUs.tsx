@@ -45,6 +45,7 @@ const benefits = [
 export default function WhyWorkWithUs() {
   return (
     <View style={styles.card}>
+      {/* Header */}
       <Text style={styles.kicker}>
         Benefits
       </Text>
@@ -54,11 +55,13 @@ export default function WhyWorkWithUs() {
       </Text>
 
       <Text style={styles.sub}>
-        Join a growing solar network
+        Join a premium solar network
         built for skilled field
-        technicians.
+        technicians who want steady
+        work and growth.
       </Text>
 
+      {/* Items */}
       <View style={styles.grid}>
         {benefits.map((item) => (
           <View
@@ -68,7 +71,7 @@ export default function WhyWorkWithUs() {
             <View style={styles.iconWrap}>
               <Ionicons
                 name={item.icon as any}
-                size={20}
+                size={19}
                 color={
                   Theme.colors.primary
                 }
@@ -87,6 +90,19 @@ export default function WhyWorkWithUs() {
           </View>
         ))}
       </View>
+
+      {/* Footer */}
+      <View style={styles.footer}>
+        <Ionicons
+          name="sparkles-outline"
+          size={15}
+          color={Theme.colors.accent}
+        />
+
+        <Text style={styles.footerText}>
+          More opportunities added regularly
+        </Text>
+      </View>
     </View>
   );
 }
@@ -95,43 +111,65 @@ const styles =
   StyleSheet.create({
     card: {
       backgroundColor:
-        Theme.colors.card,
-      borderRadius: 24,
-      padding: 18,
-      marginBottom: 16,
+        Theme.colors.surface,
+      borderRadius:
+        Theme.radius.xl,
+      padding: 20,
+      marginBottom: 18,
+
       borderWidth: 1,
       borderColor:
         Theme.colors.border,
+
+      shadowColor:
+        Theme.colors.shadow,
+      shadowOpacity: 0.06,
+      shadowRadius: 10,
+      shadowOffset: {
+        width: 0,
+        height: 6,
+      },
+
+      elevation: 3,
     },
 
     kicker: {
-      fontSize: 12,
-      fontWeight: "800",
+      alignSelf: "flex-start",
+      fontSize: 11,
+      fontWeight: "900",
       color:
         Theme.colors.primary,
-      letterSpacing: 0.4,
+      letterSpacing: 0.8,
       textTransform:
         "uppercase",
+      backgroundColor:
+        Theme.colors.surfaceAlt,
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+      borderRadius: 999,
     },
 
     title: {
       fontSize: 24,
-      fontWeight: "800",
+      fontWeight: "900",
       color:
         Theme.colors.text,
-      marginTop: 6,
+      marginTop: 12,
+      letterSpacing: -0.4,
     },
 
     sub: {
       color:
-        Theme.colors.subtext,
-      lineHeight: 20,
+        Theme.colors.subText,
+      lineHeight: 21,
       marginTop: 8,
-      marginBottom: 16,
+      marginBottom: 18,
+      fontSize: 14,
+      fontWeight: "600",
     },
 
     grid: {
-      gap: 14,
+      gap: 12,
     },
 
     item: {
@@ -139,20 +177,23 @@ const styles =
       gap: 12,
       alignItems: "flex-start",
       backgroundColor:
-        "#F8FAFC",
+        Theme.colors.surfaceAlt,
       borderRadius: 18,
       padding: 14,
     },
 
     iconWrap: {
-      width: 40,
-      height: 40,
-      borderRadius: 12,
+      width: 42,
+      height: 42,
+      borderRadius: 14,
       backgroundColor:
-        "rgba(245,158,11,0.12)",
+        Theme.colors.surface,
       alignItems: "center",
       justifyContent:
         "center",
+      borderWidth: 1,
+      borderColor:
+        Theme.colors.border,
     },
 
     content: {
@@ -171,6 +212,25 @@ const styles =
       fontSize: 13,
       lineHeight: 19,
       color:
-        Theme.colors.subtext,
+        Theme.colors.subText,
+      fontWeight: "500",
+    },
+
+    footer: {
+      marginTop: 16,
+      paddingTop: 14,
+      borderTopWidth: 1,
+      borderTopColor:
+        Theme.colors.border,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+    },
+
+    footerText: {
+      fontSize: 12,
+      fontWeight: "700",
+      color:
+        Theme.colors.subText,
     },
   });

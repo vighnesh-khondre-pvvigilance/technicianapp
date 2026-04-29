@@ -468,7 +468,7 @@ const styles =
   StyleSheet.create({
     hero: {
       backgroundColor:
-        Theme.colors.secondary,
+        Theme.colors.primary,
       padding: 20,
       borderRadius: 24,
       marginBottom: 16,
@@ -479,7 +479,7 @@ const styles =
       height: 54,
       borderRadius: 18,
       backgroundColor:
-        "rgba(255,255,255,0.15)",
+        Theme.colors.surface,
       justifyContent:
         "center",
       alignItems:
@@ -527,7 +527,7 @@ const styles =
       fontWeight: "700",
       marginBottom: 8,
       color:
-        Theme.colors.subtext,
+        Theme.colors.subText,
     },
 
     inputBox: {

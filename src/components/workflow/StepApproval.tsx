@@ -22,10 +22,17 @@ export default function StepApproval({
 
   const statusColor =
     status === "Assigned"
-      ? "#2563EB"
+      ? Theme.colors.info
       : status === "Approved"
-      ? "#16A34A"
-      : "#F59E0B";
+      ? Theme.colors.eco
+      : Theme.colors.warning;
+
+  const statusBg =
+    status === "Assigned"
+      ? Theme.colors.infoSoft
+      : status === "Approved"
+      ? Theme.colors.ecoSoft
+      : Theme.colors.warningSoft;
 
   return (
     <Screen>
@@ -34,11 +41,15 @@ export default function StepApproval({
           false
         }
         contentContainerStyle={{
-          paddingBottom: 28,
+          paddingBottom: 32,
         }}
       >
         {/* HERO */}
         <View style={styles.hero}>
+          <View
+            style={styles.heroGlow}
+          />
+
           <View
             style={styles.heroIcon}
           >
@@ -58,9 +69,9 @@ export default function StepApproval({
           <Text
             style={styles.heroSub}
           >
-            Review assigned work
-            details before starting
-            the task.
+            Review task details,
+            verify site info and
+            continue workflow.
           </Text>
         </View>
 
@@ -84,7 +95,7 @@ export default function StepApproval({
                 styles.badge,
                 {
                   backgroundColor:
-                    `${statusColor}15`,
+                    statusBg,
                 },
               ]}
             >
@@ -222,7 +233,8 @@ export default function StepApproval({
               styles.btnText
             }
           >
-            Approve & Continue
+            Approve &
+            Continue
           </Text>
 
           <Ionicons
@@ -252,7 +264,7 @@ function InfoRow({
           name={icon}
           size={18}
           color={
-            Theme.colors.primary
+            Theme.colors.accent
           }
         />
       </View>
@@ -286,18 +298,33 @@ const styles =
   StyleSheet.create({
     hero: {
       backgroundColor:
-        Theme.colors.secondary,
-      borderRadius: 22,
-      padding: 20,
+        Theme.colors.primary,
+      borderRadius:
+        Theme.radius.xl,
+      padding: 22,
       marginBottom: 16,
+      overflow:
+        "hidden",
+    },
+
+    heroGlow: {
+      position:
+        "absolute",
+      top: -30,
+      right: -20,
+      width: 130,
+      height: 130,
+      borderRadius: 100,
+      backgroundColor:
+        "rgba(255,255,255,0.08)",
     },
 
     heroIcon: {
-      width: 52,
-      height: 52,
-      borderRadius: 16,
+      width: 54,
+      height: 54,
+      borderRadius: 18,
       backgroundColor:
-        "rgba(255,255,255,0.15)",
+        "rgba(255,255,255,0.14)",
       justifyContent:
         "center",
       alignItems:
@@ -308,25 +335,37 @@ const styles =
     heroTitle: {
       fontSize: 24,
       fontWeight: "800",
-      color: "#fff",
+      color:
+        Theme.colors.textInverse,
     },
 
     heroSub: {
-      color: "#CBD5E1",
+      color:
+        "#CBD5E1",
       marginTop: 6,
-      lineHeight: 22,
       fontSize: 14,
+      lineHeight: 22,
     },
 
     card: {
       backgroundColor:
-        "#fff",
-      borderRadius: 20,
+        Theme.colors.surface,
+      borderRadius:
+        Theme.radius.lg,
       padding: 18,
       marginBottom: 16,
       borderWidth: 1,
       borderColor:
-        "#EEF2F7",
+        Theme.colors.borderLight,
+      shadowColor:
+        Theme.colors.shadow,
+      shadowOpacity: 0.04,
+      shadowRadius: 8,
+      shadowOffset: {
+        width: 0,
+        height: 4,
+      },
+      elevation: 2,
     },
 
     sectionTitle: {
@@ -347,7 +386,7 @@ const styles =
 
     badge: {
       paddingHorizontal: 12,
-      paddingVertical: 6,
+      paddingVertical: 7,
       borderRadius: 999,
     },
 
@@ -365,11 +404,11 @@ const styles =
     },
 
     iconWrap: {
-      width: 38,
-      height: 38,
-      borderRadius: 12,
+      width: 40,
+      height: 40,
+      borderRadius: 14,
       backgroundColor:
-        "#FFF7ED",
+        Theme.colors.accentSoft,
       justifyContent:
         "center",
       alignItems:
@@ -377,14 +416,14 @@ const styles =
     },
 
     label: {
-      fontSize: 12,
+      fontSize: 11,
       color:
-        Theme.colors.subtext,
-      marginBottom: 3,
+        Theme.colors.subText,
+      marginBottom: 4,
       fontWeight: "700",
       textTransform:
         "uppercase",
-      letterSpacing: 0.4,
+      letterSpacing: 0.5,
     },
 
     value: {
@@ -399,7 +438,7 @@ const styles =
       fontSize: 15,
       lineHeight: 24,
       color:
-        Theme.colors.text,
+        Theme.colors.textSecondary,
     },
 
     image: {
@@ -410,9 +449,10 @@ const styles =
 
     btn: {
       backgroundColor:
-        Theme.colors.primary,
-      padding: 17,
-      borderRadius: 18,
+        Theme.colors.accent,
+      padding: 18,
+      borderRadius:
+        Theme.radius.lg,
       flexDirection: "row",
       justifyContent:
         "center",
@@ -420,10 +460,20 @@ const styles =
         "center",
       gap: 8,
       marginTop: 4,
+      shadowColor:
+        Theme.colors.accent,
+      shadowOpacity: 0.18,
+      shadowRadius: 8,
+      shadowOffset: {
+        width: 0,
+        height: 4,
+      },
+      elevation: 4,
     },
 
     btnText: {
-      color: "#fff",
+      color:
+        Theme.colors.textInverse,
       fontWeight: "800",
       fontSize: 15,
     },

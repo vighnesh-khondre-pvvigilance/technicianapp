@@ -42,11 +42,20 @@ export default function StepSafety({
   onNext,
   onBack,
 }: Props) {
-  const verified = form?.safety?.verified || false;
-  const image = form?.safety?.image || null;
-  const confirmed = form?.safety?.confirmed || false;
+  const verified =
+    form?.safety?.verified ||
+    false;
 
-  const updateSafety = (data: any) => {
+  const image =
+    form?.safety?.image || null;
+
+  const confirmed =
+    form?.safety?.confirmed ||
+    false;
+
+  const updateSafety = (
+    data: any
+  ) => {
     updateForm({
       safety: {
         ...form?.safety,
@@ -56,127 +65,174 @@ export default function StepSafety({
   };
 
   const toggleSafety = () =>
-    updateSafety({ verified: !verified });
+    updateSafety({
+      verified: !verified,
+    });
 
   const toggleConfirm = () =>
-    updateSafety({ confirmed: !confirmed });
+    updateSafety({
+      confirmed:
+        !confirmed,
+    });
 
-  const pickImage = async () => {
-    const permission =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
+  const pickImage =
+    async () => {
+      const permission =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-    if (!permission.granted) {
+      if (
+        !permission.granted
+      ) {
+        Alert.alert(
+          "Permission Required",
+          "Please allow gallery access."
+        );
+        return;
+      }
+
+      const result =
+        await ImagePicker.launchImageLibraryAsync(
+          {
+            mediaTypes:
+              ImagePicker.MediaTypeOptions.Images,
+            quality: 0.7,
+            allowsEditing: true,
+          }
+        );
+
+      if (
+        !result.canceled
+      ) {
+        updateSafety({
+          image:
+            result.assets[0]
+              .uri,
+        });
+      }
+    };
+
+  const openCamera =
+    async () => {
+      const permission =
+        await ImagePicker.requestCameraPermissionsAsync();
+
+      if (
+        !permission.granted
+      ) {
+        Alert.alert(
+          "Permission Required",
+          "Please allow camera access."
+        );
+        return;
+      }
+
+      const result =
+        await ImagePicker.launchCameraAsync(
+          {
+            quality: 0.7,
+            allowsEditing: true,
+          }
+        );
+
+      if (
+        !result.canceled
+      ) {
+        updateSafety({
+          image:
+            result.assets[0]
+              .uri,
+        });
+      }
+    };
+
+  const chooseImage =
+    () => {
       Alert.alert(
-        "Permission Required",
-        "Please allow gallery access."
+        "Upload Safety Image",
+        "Choose image source",
+        [
+          {
+            text: "Camera",
+            onPress:
+              openCamera,
+          },
+          {
+            text: "Gallery",
+            onPress:
+              pickImage,
+          },
+          {
+            text: "Cancel",
+            style:
+              "cancel",
+          },
+        ]
       );
-      return;
-    }
+    };
 
-    const result =
-      await ImagePicker.launchImageLibraryAsync({
-        mediaTypes:
-          ImagePicker.MediaTypeOptions.Images,
-        quality: 0.7,
-        allowsEditing: true,
-      });
-
-    if (!result.canceled) {
+  const removeImage =
+    () => {
       updateSafety({
-        image: result.assets[0].uri,
+        image: null,
       });
-    }
-  };
+    };
 
-  const openCamera = async () => {
-    const permission =
-      await ImagePicker.requestCameraPermissionsAsync();
+  const handleNext =
+    () => {
+      if (!verified) {
+        Alert.alert(
+          "PPE Required",
+          "Please verify PPE checked."
+        );
+        return;
+      }
 
-    if (!permission.granted) {
-      Alert.alert(
-        "Permission Required",
-        "Please allow camera access."
-      );
-      return;
-    }
+      if (!image) {
+        Alert.alert(
+          "Upload Required",
+          "Please upload safety image."
+        );
+        return;
+      }
 
-    const result =
-      await ImagePicker.launchCameraAsync({
-        quality: 0.7,
-        allowsEditing: true,
-      });
+      if (!confirmed) {
+        Alert.alert(
+          "Confirmation Required",
+          "Please confirm instructions followed."
+        );
+        return;
+      }
 
-    if (!result.canceled) {
-      updateSafety({
-        image: result.assets[0].uri,
-      });
-    }
-  };
-
-  const chooseImage = () => {
-    Alert.alert(
-      "Upload Safety Image",
-      "Choose image source",
-      [
-        {
-          text: "Camera",
-          onPress: openCamera,
-        },
-        {
-          text: "Gallery",
-          onPress: pickImage,
-        },
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-      ]
-    );
-  };
-
-  const removeImage = () => {
-    updateSafety({ image: null });
-  };
-
-  const handleNext = () => {
-    if (!verified) {
-      Alert.alert(
-        "PPE Required",
-        "Please verify PPE checked."
-      );
-      return;
-    }
-
-    if (!image) {
-      Alert.alert(
-        "Upload Required",
-        "Please upload safety image."
-      );
-      return;
-    }
-
-    if (!confirmed) {
-      Alert.alert(
-        "Confirmation Required",
-        "Please confirm instructions followed."
-      );
-      return;
-    }
-
-    onNext();
-  };
+      onNext();
+    };
 
   return (
     <Screen>
       <ScrollView
-        showsVerticalScrollIndicator={false}
+        showsVerticalScrollIndicator={
+          false
+        }
         contentContainerStyle={{
           paddingBottom: 28,
         }}
       >
-        {/* HEADER */}
-        <View style={styles.hero}>
-          <View style={styles.heroIcon}>
+        {/* HERO */}
+        <View
+          style={
+            styles.hero
+          }
+        >
+          <View
+            style={
+              styles.heroGlow
+            }
+          />
+
+          <View
+            style={
+              styles.heroIcon
+            }
+          >
             <Ionicons
               name="shield-checkmark"
               size={26}
@@ -184,36 +240,64 @@ export default function StepSafety({
             />
           </View>
 
-          <Text style={styles.heroTitle}>
+          <Text
+            style={
+              styles.heroTitle
+            }
+          >
             Safety Verification
           </Text>
 
-          <Text style={styles.heroSub}>
-            Complete all required checks
-            before continuing.
+          <Text
+            style={
+              styles.heroSub
+            }
+          >
+            Complete all
+            mandatory checks
+            before starting
+            site work.
           </Text>
         </View>
 
-        {/* PPE CARD */}
+        {/* PPE */}
         <TouchableOpacity
           style={[
             styles.actionCard,
             verified &&
               styles.actionCardActive,
           ]}
-          onPress={toggleSafety}
-          activeOpacity={0.85}
+          onPress={
+            toggleSafety
+          }
+          activeOpacity={
+            0.88
+          }
         >
-          <View style={styles.actionLeft}>
-            <Ionicons
-              name="construct-outline"
-              size={20}
-              color={
-                verified
-                  ? "#fff"
-                  : Theme.colors.primary
-              }
-            />
+          <View
+            style={
+              styles.actionLeft
+            }
+          >
+            <View
+              style={[
+                styles.iconBox,
+                verified &&
+                  styles.iconBoxDark,
+              ]}
+            >
+              <Ionicons
+                name="construct-outline"
+                size={20}
+                color={
+                  verified
+                    ? "#fff"
+                    : Theme
+                        .colors
+                        .accent
+                }
+              />
+            </View>
 
             <Text
               style={[
@@ -234,78 +318,155 @@ export default function StepSafety({
             }
             size={24}
             color={
-              verified ? "#fff" : "#94A3B8"
+              verified
+                ? "#fff"
+                : Theme
+                    .colors
+                    .subText
             }
           />
         </TouchableOpacity>
 
         {/* RULES */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>
+        <View
+          style={
+            styles.card
+          }
+        >
+          <Text
+            style={
+              styles.cardTitle
+            }
+          >
             Instructions
           </Text>
 
-          {RULES.map((item, index) => (
-            <View
-              key={index}
-              style={styles.ruleRow}
-            >
-              <Ionicons
-                name="checkmark-circle"
-                size={18}
-                color={Theme.colors.primary}
-              />
+          {RULES.map(
+            (
+              item,
+              index
+            ) => (
+              <View
+                key={
+                  index
+                }
+                style={
+                  styles.ruleRow
+                }
+              >
+                <Ionicons
+                  name="checkmark-circle"
+                  size={18}
+                  color={
+                    Theme
+                      .colors
+                      .eco
+                  }
+                />
 
-              <Text style={styles.ruleText}>
-                {item}
-              </Text>
-            </View>
-          ))}
+                <Text
+                  style={
+                    styles.ruleText
+                  }
+                >
+                  {item}
+                </Text>
+              </View>
+            )
+          )}
         </View>
 
         {/* UPLOAD */}
         <TouchableOpacity
-          style={styles.uploadCard}
-          onPress={chooseImage}
-          activeOpacity={0.85}
+          style={
+            styles.uploadCard
+          }
+          onPress={
+            chooseImage
+          }
+          activeOpacity={
+            0.88
+          }
         >
-          <Ionicons
-            name="camera-outline"
-            size={22}
-            color={Theme.colors.primary}
-          />
+          <View
+            style={
+              styles.uploadIcon
+            }
+          >
+            <Ionicons
+              name="camera-outline"
+              size={22}
+              color={
+                Theme
+                  .colors
+                  .accent
+              }
+            />
+          </View>
 
-          <Text style={styles.uploadTitle}>
+          <Text
+            style={
+              styles.uploadTitle
+            }
+          >
             {image
               ? "Change Safety Image"
               : "Upload Safety Image"}
           </Text>
 
-          <Text style={styles.uploadSub}>
-            PPE / Site readiness photo
+          <Text
+            style={
+              styles.uploadSub
+            }
+          >
+            PPE / Site
+            readiness photo
           </Text>
         </TouchableOpacity>
 
         {/* IMAGE */}
         {image && (
-          <View style={styles.card}>
-            <View style={styles.previewHead}>
-              <Text style={styles.cardTitle}>
-                Uploaded Preview
+          <View
+            style={
+              styles.card
+            }
+          >
+            <View
+              style={
+                styles.previewHead
+              }
+            >
+              <Text
+                style={
+                  styles.cardTitle
+                }
+              >
+                Uploaded
+                Preview
               </Text>
 
               <TouchableOpacity
-                onPress={removeImage}
+                onPress={
+                  removeImage
+                }
               >
-                <Text style={styles.removeText}>
+                <Text
+                  style={
+                    styles.removeText
+                  }
+                >
                   Remove
                 </Text>
               </TouchableOpacity>
             </View>
 
             <Image
-              source={{ uri: image }}
-              style={styles.preview}
+              source={{
+                uri: image,
+              }}
+              style={
+                styles.preview
+              }
             />
           </View>
         )}
@@ -317,8 +478,12 @@ export default function StepSafety({
             confirmed &&
               styles.confirmActive,
           ]}
-          onPress={toggleConfirm}
-          activeOpacity={0.85}
+          onPress={
+            toggleConfirm
+          }
+          activeOpacity={
+            0.88
+          }
         >
           <Ionicons
             name={
@@ -330,7 +495,9 @@ export default function StepSafety({
             color={
               confirmed
                 ? "#fff"
-                : Theme.colors.primary
+                : Theme
+                    .colors
+                    .primary
             }
           />
 
@@ -341,28 +508,49 @@ export default function StepSafety({
                 styles.confirmTextActive,
             ]}
           >
-            I confirm that I followed
-            all instructions mentioned
-            above.
+            I confirm that I
+            followed all
+            instructions
+            mentioned above.
           </Text>
         </TouchableOpacity>
 
         {/* BUTTONS */}
-        <View style={styles.row}>
+        <View
+          style={
+            styles.row
+          }
+        >
           <TouchableOpacity
-            style={styles.backBtn}
-            onPress={onBack}
+            style={
+              styles.backBtn
+            }
+            onPress={
+              onBack
+            }
           >
-            <Text style={styles.backText}>
+            <Text
+              style={
+                styles.backText
+              }
+            >
               Back
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.nextBtn}
-            onPress={handleNext}
+            style={
+              styles.nextBtn
+            }
+            onPress={
+              handleNext
+            }
           >
-            <Text style={styles.nextText}>
+            <Text
+              style={
+                styles.nextText
+              }
+            >
               Continue
             </Text>
           </TouchableOpacity>
@@ -372,208 +560,318 @@ export default function StepSafety({
   );
 }
 
-const styles = StyleSheet.create({
-  hero: {
-    backgroundColor:
-      Theme.colors.secondary,
-    borderRadius: 22,
-    padding: 20,
-    marginBottom: 16,
-  },
+const styles =
+  StyleSheet.create({
+    hero: {
+      backgroundColor:
+        Theme.colors.surface,
+      borderRadius:
+        Theme.radius.xl,
+      padding: 22,
+      marginBottom: 16,
+      overflow:
+        "hidden",
+    },
 
-  heroIcon: {
-    width: 52,
-    height: 52,
-    borderRadius: 16,
-    backgroundColor:
-      "rgba(255,255,255,0.15)",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 14,
-  },
+    heroGlow: {
+      position:
+        "absolute",
+      top: -30,
+      right: -25,
+      width: 130,
+      height: 130,
+      borderRadius: 100,
+      backgroundColor:
+        "rgba(255,255,255,0.08)",
+    },
 
-  heroTitle: {
-    color: "#fff",
-    fontSize: 24,
-    fontWeight: "800",
-  },
+    heroIcon: {
+      width: 54,
+      height: 54,
+      borderRadius: 18,
+      backgroundColor:
+        "rgba(255,255,255,0.14)",
+      justifyContent:
+        "center",
+      alignItems:
+        "center",
+      marginBottom: 14,
+    },
 
-  heroSub: {
-    color: "#CBD5E1",
-    marginTop: 6,
-    fontSize: 14,
-    lineHeight: 22,
-  },
+    heroTitle: {
+      color:
+        Theme.colors.textInverse,
+      fontSize: 24,
+      fontWeight: "800",
+    },
 
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    padding: 18,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: "#EEF2F7",
-  },
+    heroSub: {
+      color:
+        "#CBD5E1",
+      marginTop: 6,
+      fontSize: 14,
+      lineHeight: 22,
+    },
 
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: "800",
-    color: Theme.colors.text,
-    marginBottom: 14,
-  },
+    card: {
+      backgroundColor:
+        Theme.colors.surface,
+      borderRadius:
+        Theme.radius.lg,
+      padding: 18,
+      marginBottom: 16,
+      borderWidth: 1,
+      borderColor:
+        Theme.colors.borderLight,
+      shadowColor:
+        Theme.colors.shadow,
+      shadowOpacity: 0.04,
+      shadowRadius: 8,
+      shadowOffset: {
+        width: 0,
+        height: 4,
+      },
+      elevation: 2,
+    },
 
-  actionCard: {
-    backgroundColor: "#fff",
-    borderRadius: 18,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    flexDirection: "row",
-    justifyContent:
-      "space-between",
-    alignItems: "center",
-  },
+    cardTitle: {
+      fontSize: 16,
+      fontWeight: "800",
+      color:
+        Theme.colors.text,
+      marginBottom: 14,
+    },
 
-  actionCardActive: {
-    backgroundColor:
-      Theme.colors.primary,
-    borderColor:
-      Theme.colors.primary,
-  },
+    actionCard: {
+      backgroundColor:
+        Theme.colors.surface,
+      borderRadius:
+        Theme.radius.lg,
+      padding: 16,
+      marginBottom: 16,
+      borderWidth: 1,
+      borderColor:
+        Theme.colors.border,
+      flexDirection:
+        "row",
+      justifyContent:
+        "space-between",
+      alignItems:
+        "center",
+    },
 
-  actionLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
+    actionCardActive: {
+      backgroundColor:
+        Theme.colors.primary,
+      borderColor:
+        Theme.colors.primary,
+    },
 
-  actionText: {
-    fontWeight: "700",
-    fontSize: 15,
-    color: Theme.colors.text,
-  },
+    actionLeft: {
+      flexDirection:
+        "row",
+      alignItems:
+        "center",
+      gap: 12,
+    },
 
-  actionTextActive: {
-    color: "#fff",
-  },
+    iconBox: {
+      width: 38,
+      height: 38,
+      borderRadius: 12,
+      backgroundColor:
+        Theme.colors.accentSoft,
+      justifyContent:
+        "center",
+      alignItems:
+        "center",
+    },
 
-  ruleRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 10,
-    marginBottom: 12,
-  },
+    iconBoxDark: {
+      backgroundColor:
+        "rgba(255,255,255,0.14)",
+    },
 
-  ruleText: {
-    flex: 1,
-    fontSize: 14,
-    color: Theme.colors.text,
-    lineHeight: 22,
-  },
+    actionText: {
+      fontWeight: "700",
+      fontSize: 15,
+      color:
+        Theme.colors.text,
+    },
 
-  uploadCard: {
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    padding: 18,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderStyle: "dashed",
-    borderColor:
-      Theme.colors.primary,
-    alignItems: "center",
-  },
+    actionTextActive: {
+      color:
+        Theme.colors.textInverse,
+    },
 
-  uploadTitle: {
-    marginTop: 10,
-    fontSize: 16,
-    fontWeight: "800",
-    color: Theme.colors.text,
-  },
+    ruleRow: {
+      flexDirection:
+        "row",
+      alignItems:
+        "flex-start",
+      gap: 10,
+      marginBottom: 12,
+    },
 
-  uploadSub: {
-    marginTop: 4,
-    fontSize: 13,
-    color: Theme.colors.subtext,
-  },
+    ruleText: {
+      flex: 1,
+      fontSize: 14,
+      lineHeight: 22,
+      color:
+        Theme.colors.text,
+    },
 
-  previewHead: {
-    flexDirection: "row",
-    justifyContent:
-      "space-between",
-    alignItems: "center",
-    marginBottom: 12,
-  },
+    uploadCard: {
+      backgroundColor:
+        Theme.colors.surface,
+      borderRadius:
+        Theme.radius.lg,
+      padding: 20,
+      marginBottom: 16,
+      borderWidth: 1.4,
+      borderStyle:
+        "dashed",
+      borderColor:
+        Theme.colors.accent,
+      alignItems:
+        "center",
+    },
 
-  removeText: {
-    color: "#DC2626",
-    fontWeight: "700",
-  },
+    uploadIcon: {
+      width: 52,
+      height: 52,
+      borderRadius: 18,
+      backgroundColor:
+        Theme.colors.accentSoft,
+      justifyContent:
+        "center",
+      alignItems:
+        "center",
+    },
 
-  preview: {
-    width: "100%",
-    height: 230,
-    borderRadius: 16,
-  },
+    uploadTitle: {
+      marginTop: 12,
+      fontSize: 16,
+      fontWeight: "800",
+      color:
+        Theme.colors.text,
+    },
 
-  confirmCard: {
-    backgroundColor: "#fff",
-    borderRadius: 18,
-    padding: 16,
-    marginBottom: 18,
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    flexDirection: "row",
-    gap: 12,
-    alignItems: "flex-start",
-  },
+    uploadSub: {
+      marginTop: 4,
+      fontSize: 13,
+      color:
+        Theme.colors.subText,
+    },
 
-  confirmActive: {
-    backgroundColor: "#16A34A",
-    borderColor: "#16A34A",
-  },
+    previewHead: {
+      flexDirection:
+        "row",
+      justifyContent:
+        "space-between",
+      alignItems:
+        "center",
+      marginBottom: 12,
+    },
 
-  confirmText: {
-    flex: 1,
-    lineHeight: 22,
-    fontWeight: "700",
-    color: Theme.colors.text,
-  },
+    removeText: {
+      color:
+        Theme.colors.danger,
+      fontWeight: "700",
+    },
 
-  confirmTextActive: {
-    color: "#fff",
-  },
+    preview: {
+      width: "100%",
+      height: 230,
+      borderRadius: 18,
+    },
 
-  row: {
-    flexDirection: "row",
-    gap: 12,
-  },
+    confirmCard: {
+      backgroundColor:
+        Theme.colors.surface,
+      borderRadius:
+        Theme.radius.lg,
+      padding: 16,
+      marginBottom: 18,
+      borderWidth: 1,
+      borderColor:
+        Theme.colors.border,
+      flexDirection:
+        "row",
+      gap: 12,
+      alignItems:
+        "flex-start",
+    },
 
-  backBtn: {
-    flex: 1,
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    padding: 16,
-    borderRadius: 16,
-    alignItems: "center",
-  },
+    confirmActive: {
+      backgroundColor:
+        Theme.colors.eco,
+      borderColor:
+        Theme.colors.eco,
+    },
 
-  backText: {
-    fontWeight: "700",
-    color: Theme.colors.text,
-  },
+    confirmText: {
+      flex: 1,
+      lineHeight: 22,
+      fontWeight: "700",
+      color:
+        Theme.colors.text,
+    },
 
-  nextBtn: {
-    flex: 1,
-    backgroundColor:
-      Theme.colors.primary,
-    padding: 16,
-    borderRadius: 16,
-    alignItems: "center",
-  },
+    confirmTextActive: {
+      color:
+        "#fff",
+    },
 
-  nextText: {
-    color: "#fff",
-    fontWeight: "800",
-  },
-});
+    row: {
+      flexDirection:
+        "row",
+      gap: 12,
+    },
+
+    backBtn: {
+      flex: 1,
+      backgroundColor:
+        Theme.colors.surface,
+      borderWidth: 1,
+      borderColor:
+        Theme.colors.border,
+      padding: 16,
+      borderRadius:
+        Theme.radius.md,
+      alignItems:
+        "center",
+    },
+
+    backText: {
+      fontWeight: "700",
+      color:
+        Theme.colors.text,
+    },
+
+    nextBtn: {
+      flex: 1,
+      backgroundColor:
+        Theme.colors.accent,
+      padding: 16,
+      borderRadius:
+        Theme.radius.md,
+      alignItems:
+        "center",
+      shadowColor:
+        Theme.colors.accent,
+      shadowOpacity: 0.18,
+      shadowRadius: 8,
+      shadowOffset: {
+        width: 0,
+        height: 4,
+      },
+      elevation: 4,
+    },
+
+    nextText: {
+      color:
+        "#fff",
+      fontWeight: "800",
+    },
+  });

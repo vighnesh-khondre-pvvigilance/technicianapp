@@ -135,52 +135,44 @@ export default function RecentWorkList() {
   };
 
   return (
-    <View
-      style={{
-        marginTop: 20,
-      }}
-    >
-      {/* DASHBOARD HEADER */}
-      <View
-        style={
-          styles.topHeader
-        }
-      >
-        <Text
-          style={
-            styles.heading
-          }
-        >
-          Performance
-        </Text>
+    <View style={styles.wrapper}>
+      {/* HEADER */}
+      <View style={styles.topHeader}>
+        <View>
+          <Text
+            style={styles.smallHead}
+          >
+            Activity Report
+          </Text>
+
+          <Text
+            style={styles.heading}
+          >
+            Performance
+          </Text>
+        </View>
 
         <TouchableOpacity
+          style={styles.linkBtn}
           onPress={() =>
             router.push(
               "/(tabs)/history"
             )
           }
         >
-          <Text
-            style={
-              styles.link
-            }
-          >
+          <Text style={styles.link}>
             View All
           </Text>
         </TouchableOpacity>
       </View>
 
-      {/* PREMIUM SUMMARY CARD */}
-      <View
-        style={
-          styles.summaryCard
-        }
-      >
+      {/* PREMIUM SUMMARY */}
+      <View style={styles.summaryCard}>
+        <View style={styles.glow1} />
+        <View style={styles.glow2} />
+
         <View
-          style={
-            styles.metricBox
-          }
+          style={styles.metricBox}
         >
           <Text
             style={
@@ -189,6 +181,7 @@ export default function RecentWorkList() {
           >
             {monthlyJobs}
           </Text>
+
           <Text
             style={
               styles.metricLabel
@@ -199,15 +192,11 @@ export default function RecentWorkList() {
         </View>
 
         <View
-          style={
-            styles.divider
-          }
+          style={styles.divider}
         />
 
         <View
-          style={
-            styles.metricBox
-          }
+          style={styles.metricBox}
         >
           <Text
             style={
@@ -216,6 +205,7 @@ export default function RecentWorkList() {
           >
             {pendingCount}
           </Text>
+
           <Text
             style={
               styles.metricLabel
@@ -226,15 +216,11 @@ export default function RecentWorkList() {
         </View>
 
         <View
-          style={
-            styles.divider
-          }
+          style={styles.divider}
         />
 
         <View
-          style={
-            styles.metricBox
-          }
+          style={styles.metricBox}
         >
           <Text
             style={
@@ -245,6 +231,7 @@ export default function RecentWorkList() {
               completedToday
             }
           </Text>
+
           <Text
             style={
               styles.metricLabel
@@ -255,7 +242,7 @@ export default function RecentWorkList() {
         </View>
       </View>
 
-      {/* TODAY TASKS */}
+      {/* TODAY HEADER */}
       <View
         style={[
           styles.topHeader,
@@ -264,45 +251,56 @@ export default function RecentWorkList() {
           },
         ]}
       >
-        <Text
-          style={
-            styles.heading
-          }
-        >
-          Today Visits
-        </Text>
+        <View>
+          <Text
+            style={styles.smallHead}
+          >
+            Schedule
+          </Text>
+
+          <Text
+            style={styles.heading}
+          >
+            Today Visits
+          </Text>
+        </View>
 
         <TouchableOpacity
+          style={styles.linkBtn}
           onPress={() =>
             router.push(
               "/(tabs)/work"
             )
           }
         >
-          <Text
-            style={
-              styles.link
-            }
-          >
+          <Text style={styles.link}>
             Open Work
           </Text>
         </TouchableOpacity>
       </View>
 
+      {/* EMPTY */}
       {todaySchedule.length ===
       0 ? (
         <View
-          style={
-            styles.emptyCard
-          }
+          style={styles.emptyCard}
         >
-          <Ionicons
-            name="calendar-outline"
-            size={24}
-            color="#94A3B8"
-          />
+          <View
+            style={
+              styles.emptyIcon
+            }
+          >
+            <Ionicons
+              name="calendar-outline"
+              size={24}
+              color={
+                Theme.colors
+                  .primary
+              }
+            />
+          </View>
 
-          <View>
+          <View style={{ flex: 1 }}>
             <Text
               style={
                 styles.emptyTitle
@@ -344,7 +342,7 @@ export default function RecentWorkList() {
                   item.id
                 }
                 activeOpacity={
-                  0.85
+                  0.88
                 }
                 style={[
                   styles.taskCard,
@@ -359,7 +357,7 @@ export default function RecentWorkList() {
                   )
                 }
               >
-                {/* Date */}
+                {/* DATE */}
                 <View
                   style={
                     styles.dateBadge
@@ -386,7 +384,7 @@ export default function RecentWorkList() {
                   </Text>
                 </View>
 
-                {/* Content */}
+                {/* CONTENT */}
                 <View
                   style={{
                     flex: 1,
@@ -396,6 +394,7 @@ export default function RecentWorkList() {
                     style={
                       styles.taskTitle
                     }
+                    numberOfLines={1}
                   >
                     {
                       item.title
@@ -406,6 +405,7 @@ export default function RecentWorkList() {
                     style={
                       styles.taskSub
                     }
+                    numberOfLines={1}
                   >
                     {
                       item.clientName
@@ -420,6 +420,7 @@ export default function RecentWorkList() {
                     style={
                       styles.location
                     }
+                    numberOfLines={1}
                   >
                     {
                       item.location
@@ -463,20 +464,32 @@ export default function RecentWorkList() {
                   </View>
                 </View>
 
-                {/* Status */}
-                <Ionicons
-                  name={
-                    done
-                      ? "checkmark-circle"
-                      : "time"
+                {/* STATUS */}
+                <View
+                  style={
+                    styles.statusWrap
                   }
-                  size={24}
-                  color={
-                    done
-                      ? "#10B981"
-                      : "#F59E0B"
-                  }
-                />
+                >
+                  <Ionicons
+                    name={
+                      done
+                        ? "checkmark-circle"
+                        : "time"
+                    }
+                    size={24}
+                    color={
+                      done
+                        ? "#10B981"
+                        : "#F59E0B"
+                    }
+                  />
+
+                  <Ionicons
+                    name="chevron-forward"
+                    size={16}
+                    color="#94A3B8"
+                  />
+                </View>
               </TouchableOpacity>
             );
           }
@@ -488,39 +501,85 @@ export default function RecentWorkList() {
 
 const styles =
   StyleSheet.create({
+    wrapper: {
+      marginTop: 22,
+    },
+
     topHeader: {
-      flexDirection:
-        "row",
+      flexDirection: "row",
       justifyContent:
         "space-between",
       alignItems:
         "center",
-      marginBottom: 12,
+      marginBottom: 14,
     },
 
-    heading: {
-      fontSize: 18,
-      fontWeight: "800",
-      color: "#0F172A",
-    },
-
-    link: {
+    smallHead: {
       fontSize: 13,
       fontWeight: "700",
       color:
-        Theme.colors.primary,
+        Theme.colors
+          .subText,
+    },
+
+    heading: {
+      fontSize: 20,
+      fontWeight: "900",
+      color:
+        Theme.colors.text,
+      marginTop: 2,
+    },
+
+    linkBtn: {
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: 14,
+      backgroundColor:
+        Theme.colors
+          .surface,
+    },
+
+    link: {
+      fontSize: 12,
+      fontWeight: "800",
+      color:
+        Theme.colors
+          .primary,
     },
 
     summaryCard: {
       backgroundColor:
-        Theme.colors.primary,
-      borderRadius: 24,
-      paddingVertical: 20,
-      flexDirection:
-        "row",
+        Theme.colors
+          .primary,
+      borderRadius: 28,
+      paddingVertical: 22,
+      flexDirection: "row",
       alignItems:
         "center",
+      overflow: "hidden",
       elevation: 3,
+    },
+
+    glow1: {
+      position: "absolute",
+      top: -45,
+      right: -15,
+      width: 150,
+      height: 150,
+      borderRadius: 75,
+      backgroundColor:
+        "rgba(255,255,255,0.08)",
+    },
+
+    glow2: {
+      position: "absolute",
+      bottom: -55,
+      left: -20,
+      width: 120,
+      height: 120,
+      borderRadius: 60,
+      backgroundColor:
+        "rgba(255,255,255,0.05)",
     },
 
     metricBox: {
@@ -531,51 +590,68 @@ const styles =
 
     metricNumber: {
       color: "#fff",
-      fontSize: 24,
-      fontWeight: "800",
+      fontSize: 28,
+      fontWeight: "900",
     },
 
     metricLabel: {
-      color: "#E2E8F0",
+      color:
+        "rgba(255,255,255,0.72)",
       fontSize: 12,
-      marginTop: 4,
+      marginTop: 5,
+      fontWeight: "700",
     },
 
     divider: {
       width: 1,
-      height: 44,
+      height: 46,
       backgroundColor:
-        "rgba(255,255,255,0.15)",
+        "rgba(255,255,255,0.14)",
     },
 
     emptyCard: {
       backgroundColor:
-        "#fff",
-      borderRadius: 18,
+        Theme.colors
+          .surface,
+      borderRadius: 22,
       padding: 18,
       flexDirection:
         "row",
+      alignItems:
+        "center",
       gap: 12,
+    },
+
+    emptyIcon: {
+      width: 48,
+      height: 48,
+      borderRadius: 16,
+      backgroundColor:
+        "#EEF2FF",
+      justifyContent:
+        "center",
       alignItems:
         "center",
     },
 
     emptyTitle: {
-      fontWeight: "700",
+      fontWeight: "800",
       fontSize: 15,
-      color: "#0F172A",
+      color:
+        Theme.colors.text,
     },
 
     emptyText: {
-      marginTop: 3,
-      fontSize: 13,
+      marginTop: 4,
+      fontSize: 12,
       color: "#64748B",
     },
 
     taskCard: {
       backgroundColor:
-        "#fff",
-      borderRadius: 20,
+        Theme.colors
+          .surface,
+      borderRadius: 24,
       padding: 14,
       marginBottom: 12,
       flexDirection:
@@ -587,9 +663,9 @@ const styles =
     },
 
     dateBadge: {
-      width: 58,
-      height: 58,
-      borderRadius: 16,
+      width: 60,
+      height: 60,
+      borderRadius: 18,
       backgroundColor:
         "#F8FAFC",
       justifyContent:
@@ -601,15 +677,16 @@ const styles =
 
     day: {
       fontSize: 20,
-      fontWeight: "800",
-      color: "#0F172A",
+      fontWeight: "900",
+      color:
+        Theme.colors.text,
       lineHeight: 22,
     },
 
     month: {
       fontSize: 11,
       color: "#64748B",
-      fontWeight: "700",
+      fontWeight: "800",
       textTransform:
         "uppercase",
     },
@@ -617,7 +694,8 @@ const styles =
     taskTitle: {
       fontSize: 15,
       fontWeight: "800",
-      color: "#0F172A",
+      color:
+        Theme.colors.text,
     },
 
     taskSub: {
@@ -637,8 +715,9 @@ const styles =
         "row",
       alignItems:
         "center",
-      marginTop: 8,
+      marginTop: 9,
       gap: 8,
+      flexWrap: "wrap",
     },
 
     priorityTag: {
@@ -650,12 +729,19 @@ const styles =
     priorityText: {
       color: "#fff",
       fontSize: 10,
-      fontWeight: "800",
+      fontWeight: "900",
     },
 
     visitType: {
       fontSize: 11,
       color: "#64748B",
       fontWeight: "700",
+    },
+
+    statusWrap: {
+      marginLeft: 10,
+      alignItems:
+        "center",
+      gap: 8,
     },
   });
