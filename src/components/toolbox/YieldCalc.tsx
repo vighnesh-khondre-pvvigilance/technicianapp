@@ -62,6 +62,10 @@ export default function YieldCalc() {
         style={styles.input}
         keyboardType="numeric"
         placeholder="Ex: 5"
+        placeholderTextColor={
+                    Theme.colors
+                      .subText
+                  }
         value={pdc}
         onChangeText={setPdc}
       />
@@ -71,6 +75,10 @@ export default function YieldCalc() {
         style={styles.input}
         keyboardType="numeric"
         placeholder="Ex: 5.5"
+        placeholderTextColor={
+                    Theme.colors
+                      .subText
+                  }
         value={psh}
         onChangeText={setPsh}
       />
@@ -80,6 +88,10 @@ export default function YieldCalc() {
         style={styles.input}
         keyboardType="numeric"
         placeholder="Ex: 78"
+        placeholderTextColor={
+                    Theme.colors
+                      .subText
+                  }
         value={efficiency}
         onChangeText={setEfficiency}
       />

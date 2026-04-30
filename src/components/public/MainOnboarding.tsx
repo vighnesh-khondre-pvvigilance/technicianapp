@@ -9,11 +9,14 @@ import {
   StyleSheet,
   StatusBar,
 } from "react-native";
+
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+
 import Animated, {
   FadeInDown,
   FadeInUp,
+  ZoomIn,
 } from "react-native-reanimated";
 
 import HeroBanner from "./HeroBanner";
@@ -33,9 +36,7 @@ export default function MainOnboarding() {
     <>
       <StatusBar
         translucent={false}
-        backgroundColor={
-          Theme.colors.background
-        }
+        backgroundColor={Theme.colors.background}
         barStyle="dark-content"
       />
 
@@ -44,30 +45,30 @@ export default function MainOnboarding() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        {/* HEADER */}
-        <Animated.View entering={FadeInDown.delay(100)}>
+        {/* TOP HEADER */}
+        <Animated.View entering={FadeInDown.delay(80)}>
           <View style={styles.topRow}>
             <View>
               <Text style={styles.brand}>PVprotech</Text>
               <Text style={styles.caption}>
-                Premium Solar Technician Network
+                India’s Premium Solar Technician Network
               </Text>
             </View>
 
-            <View style={styles.badge}>
-              <View style={styles.dot} />
-              <Text style={styles.badgeText}>Hiring</Text>
+            <View style={styles.liveBadge}>
+              <View style={styles.liveDot} />
+              <Text style={styles.liveText}>Hiring</Text>
             </View>
           </View>
         </Animated.View>
 
         {/* HERO */}
-        <Animated.View entering={FadeInUp.delay(150)}>
+        <Animated.View entering={FadeInUp.delay(130)}>
           <HeroBanner />
         </Animated.View>
 
-        {/* TRUST */}
-        <Animated.View entering={FadeInUp.delay(200)}>
+        {/* TRUST STRIP */}
+        <Animated.View entering={FadeInUp.delay(180)}>
           <View style={styles.trustRow}>
             <View style={styles.trustItem}>
               <Ionicons
@@ -78,7 +79,7 @@ export default function MainOnboarding() {
               <Text style={styles.trustText}>Verified</Text>
             </View>
 
-            <View style={styles.separator} />
+            <View style={styles.divider} />
 
             <View style={styles.trustItem}>
               <Ionicons
@@ -89,7 +90,7 @@ export default function MainOnboarding() {
               <Text style={styles.trustText}>100+ Techs</Text>
             </View>
 
-            <View style={styles.separator} />
+            <View style={styles.divider} />
 
             <View style={styles.trustItem}>
               <Ionicons
@@ -97,59 +98,59 @@ export default function MainOnboarding() {
                 size={15}
                 color={Theme.colors.accent}
               />
-              <Text style={styles.trustText}>Top Rated</Text>
+              <Text style={styles.trustText}>4.9 Rated</Text>
             </View>
           </View>
         </Animated.View>
 
         {/* STATS */}
-        <Animated.View entering={FadeInUp.delay(250)}>
+        <Animated.View entering={FadeInUp.delay(230)}>
           <StatsStrip />
         </Animated.View>
 
-        {/* SECTIONS */}
-        <Animated.View entering={FadeInUp.delay(300)}>
+        {/* CONTENT BLOCKS */}
+        <Animated.View entering={FadeInUp.delay(280)}>
           <WhoCanJoin />
         </Animated.View>
 
-        <Animated.View entering={FadeInUp.delay(350)}>
+        <Animated.View entering={FadeInUp.delay(330)}>
           <WhyWorkWithUs />
         </Animated.View>
 
-        <Animated.View entering={FadeInUp.delay(400)}>
+        <Animated.View entering={FadeInUp.delay(380)}>
           <WhatWorkYoullDo />
         </Animated.View>
 
-        <Animated.View entering={FadeInUp.delay(450)}>
+        <Animated.View entering={FadeInUp.delay(430)}>
           <HowApprovalWorks />
         </Animated.View>
 
-        <Animated.View entering={FadeInUp.delay(500)}>
+        <Animated.View entering={FadeInUp.delay(480)}>
           <TechnicianStories />
         </Animated.View>
 
-        {/* CTA */}
-        <Animated.View entering={FadeInUp.delay(550)}>
-          <View style={styles.card}>
-            <View style={styles.smallBadge}>
+        {/* FINAL TESLA CTA */}
+        <Animated.View entering={ZoomIn.delay(550)}>
+          <View style={styles.ctaCard}>
+            <View style={styles.ribbon}>
               <Ionicons
-                name="flash-outline"
+                name="flash"
                 size={14}
                 color={Theme.colors.textInverse}
               />
-              <Text style={styles.smallBadgeText}>
+              <Text style={styles.ribbonText}>
                 Limited Openings
               </Text>
             </View>
 
-            <Text style={styles.title}>
-              Ready to Start?
+            <Text style={styles.ctaTitle}>
+              Build Your Solar Career
             </Text>
 
-            <Text style={styles.sub}>
+            <Text style={styles.ctaSub}>
               Join one of India’s fastest-growing
-              solar technician networks and unlock
-              premium field opportunities.
+              technician networks and access
+              verified premium field jobs.
             </Text>
 
             <TouchableOpacity
@@ -178,7 +179,7 @@ export default function MainOnboarding() {
             >
               <Ionicons
                 name="log-in-outline"
-                size={17}
+                size={18}
                 color={Theme.colors.primary}
               />
 
@@ -186,6 +187,15 @@ export default function MainOnboarding() {
                 Technician Login
               </Text>
             </TouchableOpacity>
+          </View>
+        </Animated.View>
+
+        {/* FOOTER */}
+        <Animated.View entering={FadeInUp.delay(620)}>
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>
+              Trusted by solar professionals across India
+            </Text>
           </View>
         </Animated.View>
       </ScrollView>
@@ -201,32 +211,32 @@ const styles = StyleSheet.create({
 
   content: {
     paddingHorizontal: Theme.spacing.sm,
-    paddingTop: 14,
-    paddingBottom: 50,
+    paddingTop: 16,
+    paddingBottom: 60,
   },
 
   topRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: Theme.spacing.md,
+    marginBottom: 18,
   },
 
   brand: {
-    fontSize: 30,
+    fontSize: 32,
     fontWeight: "900",
     color: Theme.colors.primary,
-    letterSpacing: -0.6,
+    letterSpacing: -0.8,
   },
 
   caption: {
     marginTop: 4,
     fontSize: 13,
-    fontWeight: "600",
     color: Theme.colors.subText,
+    fontWeight: "600",
   },
 
-  badge: {
+  liveBadge: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
@@ -236,25 +246,25 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
 
-  dot: {
+  liveDot: {
     width: 8,
     height: 8,
     borderRadius: 99,
     backgroundColor: Theme.colors.eco,
   },
 
-  badgeText: {
-    color: Theme.colors.eco,
+  liveText: {
     fontSize: 12,
-    fontWeight: "800",
+    fontWeight: "900",
+    color: Theme.colors.eco,
   },
 
   trustRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginTop: Theme.spacing.sm,
-    marginBottom: Theme.spacing.lg,
+    marginTop: 16,
+    marginBottom: 24,
   },
 
   trustItem: {
@@ -265,38 +275,38 @@ const styles = StyleSheet.create({
 
   trustText: {
     fontSize: 12,
-    fontWeight: "700",
+    fontWeight: "800",
     color: Theme.colors.subText,
   },
 
-  separator: {
+  divider: {
     width: 4,
     height: 4,
-    borderRadius: 99,
+    borderRadius: 50,
     backgroundColor: Theme.colors.border,
     marginHorizontal: 12,
   },
 
-  card: {
+  ctaCard: {
+    marginTop: 16,
     backgroundColor: Theme.colors.surface,
-    borderRadius: Theme.radius.xl,
-    padding: 22,
-    marginTop: 10,
+    borderRadius: 28,
+    padding: 24,
     borderWidth: 1,
     borderColor: Theme.colors.border,
 
     shadowColor: Theme.colors.shadow,
-    shadowOpacity: 0.08,
-    shadowRadius: 14,
+    shadowOpacity: 0.12,
+    shadowRadius: 18,
     shadowOffset: {
       width: 0,
-      height: 8,
+      height: 10,
     },
 
-    elevation: 4,
+    elevation: 6,
   },
 
-  smallBadge: {
+  ribbon: {
     alignSelf: "flex-start",
     flexDirection: "row",
     alignItems: "center",
@@ -305,64 +315,76 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 999,
-    marginBottom: Theme.spacing.md,
+    marginBottom: 16,
   },
 
-  smallBadgeText: {
+  ribbonText: {
     color: Theme.colors.textInverse,
+    fontWeight: "900",
     fontSize: 12,
-    fontWeight: "800",
   },
 
-  title: {
-    fontSize: 24,
+  ctaTitle: {
+    fontSize: 28,
     fontWeight: "900",
     color: Theme.colors.text,
+    letterSpacing: -0.5,
   },
 
-  sub: {
+  ctaSub: {
     marginTop: 8,
-    marginBottom: Theme.spacing.md,
-    lineHeight: 22,
-    fontSize: 14,
+    marginBottom: 18,
     color: Theme.colors.subText,
+    fontSize: 14,
+    lineHeight: 22,
   },
 
   primaryBtn: {
-    height: 56,
-    borderRadius: Theme.radius.lg,
+    height: 58,
+    borderRadius: 18,
     backgroundColor: Theme.colors.accent,
 
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "center",
+    alignItems: "center",
     gap: 8,
 
     marginBottom: 12,
   },
 
   primaryText: {
-    color: Theme.colors.text,
     fontSize: 15,
     fontWeight: "900",
+    color: Theme.colors.text,
   },
 
   secondaryBtn: {
-    height: 52,
-    borderRadius: Theme.radius.md,
-    backgroundColor: Theme.colors.surfaceAlt,
+    height: 54,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: Theme.colors.border,
+    backgroundColor: Theme.colors.surfaceAlt,
 
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "center",
+    alignItems: "center",
     gap: 8,
   },
 
   secondaryText: {
-    color: Theme.colors.primary,
     fontSize: 14,
     fontWeight: "800",
+    color: Theme.colors.primary,
+  },
+
+  footer: {
+    alignItems: "center",
+    marginTop: 22,
+  },
+
+  footerText: {
+    fontSize: 12,
+    color: Theme.colors.subText,
+    fontWeight: "600",
   },
 });

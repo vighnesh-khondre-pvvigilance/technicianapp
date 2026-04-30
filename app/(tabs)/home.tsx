@@ -140,7 +140,7 @@ export default function HomeScreen() {
             style={styles.section}
           >
             <View style={styles.block}>
-              
+
 
               <QuickSolveGrid
                 onPress={openTool}
@@ -168,23 +168,17 @@ export default function HomeScreen() {
             style={styles.section}
           >
             <View style={styles.block}>
-              
-                
 
-                
+
+
+
 
               <RecentWorkList />
             </View>
           </Animated.View>
 
-          {/* CTA */}
-          
 
-          <View
-            style={{
-              height: 120,
-            }}
-          />
+
         </ScrollView>
 
         {/* TOOL SHEET */}
@@ -219,7 +213,7 @@ const styles =
 
     scroll: {
       paddingTop: 6,
-      paddingBottom:0,
+      paddingBottom: 0,
     },
 
     section: {
@@ -271,6 +265,7 @@ const styles =
         Theme.colors.surface,
       borderRadius: 26,
       padding: 16,
+      paddingBottom: 16,
       borderWidth: 1,
       borderColor:
         Theme.colors.border,
@@ -302,88 +297,13 @@ const styles =
         Theme.colors.subText,
     },
 
-    cta: {
-      marginTop: 26,
-      marginHorizontal: 6,
-      backgroundColor:
-        Theme.colors.primary,
-      borderRadius: 30,
-      padding: 22,
-      alignItems: "center",
-      overflow: "hidden",
-      shadowColor:
-        Theme.colors.primary,
-      shadowOpacity: 0.18,
-      shadowRadius: 18,
-      shadowOffset: {
-        width: 0,
-        height: 10,
-      },
-      elevation: 8,
-    },
 
-    ctaGlow: {
-      position: "absolute",
-      top: -50,
-      right: -35,
-      width: 170,
-      height: 170,
-      borderRadius: 90,
-      backgroundColor:
-        Theme.colors.primaryMid,
-      opacity: 0.65,
-    },
 
-    ctaIcon: {
-      width: 58,
-      height: 58,
-      borderRadius: 29,
-      justifyContent:
-        "center",
-      alignItems: "center",
-      backgroundColor:
-        Theme.colors.accent,
-      marginBottom: 14,
-    },
 
-    ctaTitle: {
-      fontSize: 22,
-      fontWeight: "800",
-      color:
-        Theme.colors.textInverse,
-      textAlign: "center",
-    },
 
-    ctaSub: {
-      marginTop: 8,
-      fontSize: 14,
-      lineHeight: 22,
-      textAlign: "center",
-      color:
-        "rgba(255,255,255,0.76)",
-      marginBottom: 18,
-    },
 
-    ctaBtn: {
-      minWidth: 180,
-      height: 54,
-      borderRadius: 18,
-      paddingHorizontal: 20,
-      backgroundColor:
-        Theme.colors.accent,
-      flexDirection: "row",
-      justifyContent:
-        "center",
-      alignItems: "center",
-      gap: 8,
-    },
 
-    ctaBtnText: {
-      color:
-        Theme.colors.primary,
-      fontSize: 15,
-      fontWeight: "800",
-    },
+
 
     sheetBg: {
       backgroundColor:

@@ -356,7 +356,7 @@ export default function StepUpload({
         {/* HERO */}
         <LinearGradient
           colors={[
-            Theme.colors.secondary,
+            Theme.colors.primary,
             "#111827",
           ]}
           style={styles.hero}

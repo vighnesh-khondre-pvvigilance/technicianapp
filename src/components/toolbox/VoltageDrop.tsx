@@ -52,6 +52,10 @@ export default function VoltageDrop() {
         style={styles.input}
         keyboardType="numeric"
         placeholder="Enter one-way length"
+        placeholderTextColor={
+                    Theme.colors
+                      .subText
+                  }
         value={length}
         onChangeText={setLength}
       />
@@ -61,6 +65,10 @@ export default function VoltageDrop() {
         style={styles.input}
         keyboardType="numeric"
         placeholder="Enter current"
+        placeholderTextColor={
+                    Theme.colors
+                      .subText
+                  }
         value={current}
         onChangeText={setCurrent}
       />
@@ -70,6 +78,10 @@ export default function VoltageDrop() {
         style={styles.input}
         keyboardType="numeric"
         placeholder="Enter cable resistance"
+        placeholderTextColor={
+                    Theme.colors
+                      .subText
+                  }
         value={resistance}
         onChangeText={setResistance}
       />

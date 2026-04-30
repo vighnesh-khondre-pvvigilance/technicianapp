@@ -50,6 +50,10 @@ export default function CleaningCalc() {
         style={styles.input}
         keyboardType="numeric"
         placeholder="Enter before value"
+        placeholderTextColor={
+                    Theme.colors
+                      .subText
+                  }
         value={beforePower}
         onChangeText={setBeforePower}
       />
@@ -59,6 +63,10 @@ export default function CleaningCalc() {
         style={styles.input}
         keyboardType="numeric"
         placeholder="Enter after value"
+        placeholderTextColor={
+                    Theme.colors
+                      .subText
+                  }
         value={afterPower}
         onChangeText={setAfterPower}
       />

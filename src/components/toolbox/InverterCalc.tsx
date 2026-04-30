@@ -47,6 +47,10 @@ export default function InverterCalc() {
         style={styles.input}
         keyboardType="numeric"
         placeholder="Enter DC power"
+        placeholderTextColor={
+                    Theme.colors
+                      .subText
+                  }
         value={dcPower}
         onChangeText={setDcPower}
       />
@@ -56,6 +60,10 @@ export default function InverterCalc() {
         style={styles.input}
         keyboardType="numeric"
         placeholder="Enter AC power"
+        placeholderTextColor={
+                    Theme.colors
+                      .subText
+                  }
         value={acPower}
         onChangeText={setAcPower}
       />

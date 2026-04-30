@@ -368,7 +368,7 @@ export default function Work() {
             false
           }
           contentContainerStyle={{
-            paddingBottom: 30,
+            paddingBottom: 0,
           }}
           ListEmptyComponent={
             <Animated.View

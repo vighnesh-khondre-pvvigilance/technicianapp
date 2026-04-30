@@ -57,7 +57,7 @@ export default function HeaderCard() {
         ) {
           setCityName(
             user?.city ||
-              "Pune, Maharashtra"
+              "kolhapur, Maharashtra"
           );
           setLoadingLocation(
             false

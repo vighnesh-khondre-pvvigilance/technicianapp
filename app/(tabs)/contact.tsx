@@ -525,7 +525,7 @@ export default function ContactScreen() {
               false
             }
             contentContainerStyle={{
-              paddingBottom: 30,
+              paddingBottom: 0,
             }}
             ListEmptyComponent={
               <ReAnimated.View

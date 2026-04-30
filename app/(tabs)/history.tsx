@@ -415,7 +415,7 @@ export default function History() {
           />
         }
         contentContainerStyle={{
-          paddingBottom: 30,
+          paddingBottom: 0,
           paddingHorizontal: 6,
         }}
         ListHeaderComponent={

@@ -53,7 +53,7 @@ export default function VocCalc() {
     if (value <= 600)
       return {
         text: "Safe for 600V system",
-        color: Theme.colors.success,
+        color: Theme.colors.info,
       };
 
     if (value <= 1000)
@@ -110,6 +110,10 @@ export default function VocCalc() {
               label="Panel Voc (STC)"
               unit="V"
               placeholder="Ex: 49.5"
+              placeholderTextColor={
+                    Theme.colors
+                      .subText
+                  }
               value={voc}
               onChangeText={setVoc}
             />
@@ -118,6 +122,10 @@ export default function VocCalc() {
               label="Temp Coefficient"
               unit="%/°C"
               placeholder="Ex: -0.28"
+              placeholderTextColor={
+                    Theme.colors
+                      .subText
+                  }
               value={alpha}
               onChangeText={setAlpha}
             />
@@ -126,6 +134,10 @@ export default function VocCalc() {
               label="Minimum Site Temp"
               unit="°C"
               placeholder="Ex: -5"
+              placeholderTextColor={
+                    Theme.colors
+                      .subText
+                  }
               value={tMin}
               onChangeText={setTMin}
             />
@@ -134,6 +146,10 @@ export default function VocCalc() {
               label="Modules in Series"
               unit="Nos"
               placeholder="Ex: 12"
+              placeholderTextColor={
+                    Theme.colors
+                      .subText
+                  }
               value={modules}
               onChangeText={setModules}
             />
@@ -297,7 +313,7 @@ const styles = StyleSheet.create({
   },
 
   unit: {
-    color: Theme.colors.subtext,
+    color: Theme.colors.subText,
     fontWeight: "600",
   },
 
@@ -336,7 +352,7 @@ const styles = StyleSheet.create({
 
   metricLabel: {
     fontSize: 14,
-    color: Theme.colors.subtext,
+    color: Theme.colors.subText,
     fontWeight: "600",
   },
 
@@ -368,7 +384,7 @@ const styles = StyleSheet.create({
 
   infoSub: {
     marginTop: 8,
-    color: Theme.colors.subtext,
+    color: Theme.colors.subText,
     fontSize: 13,
     lineHeight: 18,
   },

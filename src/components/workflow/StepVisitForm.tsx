@@ -340,6 +340,7 @@ export default function StepVisitForm({
                 )
               }
               keyboardType="numeric"
+              placeholder="600"
             />
 
             <Field
@@ -357,6 +358,7 @@ export default function StepVisitForm({
                 )
               }
               keyboardType="numeric"
+              placeholder="700"
             />
 
             <Field
@@ -374,6 +376,7 @@ export default function StepVisitForm({
                 )
               }
               keyboardType="numeric"
+              placeholder="800"
             />
 
             <Field
@@ -391,6 +394,7 @@ export default function StepVisitForm({
                 )
               }
               keyboardType="numeric"
+              placeholder="900"
             />
 
             <Text
@@ -479,7 +483,7 @@ const styles =
       height: 54,
       borderRadius: 18,
       backgroundColor:
-        Theme.colors.surface,
+        Theme.colors.primary,
       justifyContent:
         "center",
       alignItems:
